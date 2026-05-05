@@ -1,0 +1,16 @@
+# Cache and outputs created by run_amt.py
+.amt-cache/
+out/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
