@@ -2,9 +2,9 @@
 """
 run_amt.py — Run the AMT.engine pipeline on a single TTL file.
 
-Fetches AMT.engine from GitHub (cached locally), installs it into an
-isolated virtual environment, and runs the full pipeline against an
-input file:
+Clones AMT.engine from GitHub into a local cache, installs its three
+dependencies (rdflib, pyshacl, pyvis) into your active Python environment,
+and runs the full pipeline:
 
     validate (SHACL) → reason → export TTL + Cypher + HTML
 
@@ -15,16 +15,16 @@ Usage
     python run_amt.py path/to/input.ttl --update      # pull latest amt.engine
     python run_amt.py path/to/input.ttl --ref v0.2.0  # pin to a tag/branch/sha
 
-Requires only Python ≥ 3.10 and git on PATH.
+Requires Python ≥ 3.10 and git on PATH. Dependencies are installed into
+the Python that runs this script — use a venv if you want isolation.
 """
 
 from __future__ import annotations
 
 import argparse
-import os
 import subprocess
 import sys
-import venv
+from datetime import datetime
 from pathlib import Path
 
 # --------------------------------------------------------------------------- #
@@ -32,24 +32,17 @@ from pathlib import Path
 # --------------------------------------------------------------------------- #
 AMT_REPO_URL = "https://github.com/n4o-rse/amt-engine.git"
 AMT_DEFAULT_REF = "main"
+AMT_DEPS = ["rdflib>=7.0", "pyshacl>=0.25", "pyvis>=0.3"]
 
-# Cache lives next to this script — portable, easy to nuke.
 SCRIPT_DIR = Path(__file__).resolve().parent
 CACHE_DIR = SCRIPT_DIR / ".amt-cache"
 REPO_DIR = CACHE_DIR / "amt-engine"
-VENV_DIR = CACHE_DIR / "venv"
+DEPS_MARKER = CACHE_DIR / ".deps-installed"
 
 
 # --------------------------------------------------------------------------- #
 # Helpers
 # --------------------------------------------------------------------------- #
-def venv_bin(name: str) -> Path:
-    """Path to an executable inside the cache venv (cross-platform)."""
-    if os.name == "nt":  # Windows
-        return VENV_DIR / "Scripts" / f"{name}.exe"
-    return VENV_DIR / "bin" / name
-
-
 def run(cmd, **kwargs) -> None:
     """Run a subprocess, streaming output, raising on non-zero exit."""
     cmd = [str(c) for c in cmd]
@@ -62,73 +55,104 @@ def ensure_repo(ref: str, update: bool) -> None:
     if not REPO_DIR.exists():
         print(f"[1/3] Cloning {AMT_REPO_URL} ...")
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        run(["git", "clone", AMT_REPO_URL, REPO_DIR])
+        run(["git", "clone", "--depth", "1", AMT_REPO_URL, REPO_DIR])
     elif update:
         print("[1/3] Updating cached amt.engine ...")
         run(["git", "-C", REPO_DIR, "fetch", "--all", "--tags"])
     else:
         print(f"[1/3] Using cached amt.engine at {REPO_DIR}")
 
-    # Always checkout the requested ref so --ref is honoured between runs.
     run(["git", "-C", REPO_DIR, "checkout", ref],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     if update:
-        # Fast-forward if on a branch; quietly skip if HEAD is detached.
         subprocess.run(
             ["git", "-C", str(REPO_DIR), "pull", "--ff-only"],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
 
 
-def ensure_venv() -> None:
-    """Create the cache venv and install amt.engine in editable mode."""
-    if venv_bin("amt").exists():
-        print(f"[2/3] Using cached venv at {VENV_DIR}")
-        return
+def ensure_deps() -> None:
+    """Install rdflib / pyshacl / pyvis into the active Python (once)."""
+    if DEPS_MARKER.exists():
+        # Quick sanity check: are the imports actually available? If someone
+        # nuked their env between runs, the marker lies — re-install.
+        try:
+            for mod in ("rdflib", "pyshacl", "pyvis"):
+                __import__(mod)
+            print("[2/3] Dependencies already installed")
+            return
+        except ImportError:
+            print("[2/3] Marker present but imports missing — reinstalling")
 
-    print(f"[2/3] Creating venv at {VENV_DIR} and installing amt.engine ...")
-    venv.create(VENV_DIR, with_pip=True, clear=False)
-    pip = venv_bin("pip")
-    run([pip, "install", "--upgrade", "pip", "--quiet"])
-    run([pip, "install", "-e", REPO_DIR, "--quiet"])
+    else:
+        print(f"[2/3] Installing dependencies into {sys.executable}")
+        print(f"      ({', '.join(AMT_DEPS)})")
 
-
-def reinstall_if_repo_changed() -> None:
-    """If the repo HEAD moved since last install, reinstall (cheap with -e)."""
-    head_file = CACHE_DIR / ".installed-head"
-    head = subprocess.check_output(
-        ["git", "-C", str(REPO_DIR), "rev-parse", "HEAD"]
-    ).decode().strip()
-
-    if head_file.exists() and head_file.read_text().strip() == head:
-        return
-    print("      → repo HEAD changed, reinstalling")
-    run([venv_bin("pip"), "install", "-e", REPO_DIR, "--quiet"])
-    head_file.write_text(head)
+    run([sys.executable, "-m", "pip", "install", "--quiet", *AMT_DEPS])
+    DEPS_MARKER.touch()
 
 
 def run_pipeline(input_file: Path, outdir: Path) -> None:
-    """Invoke the AMT CLI with the full pipeline of flags."""
-    outdir.mkdir(parents=True, exist_ok=True)
-    stem = input_file.stem
-    ttl_out = outdir / f"{stem}.reasoned.ttl"
-    cypher_out = outdir / f"{stem}.cypher"
-    html_out = outdir / f"{stem}.html"
+    """Invoke amt.runner — the full-pipeline entry point of AMT.engine.
+
+    Each run gets its own timestamped subfolder: out/run-YYYYMMDD-HHMMSS/.
+    This sidesteps amt.runner's behaviour of wiping its output directory
+    before writing — every run lives in a fresh folder, so previous runs
+    are preserved and runs against different input files don't collide.
+
+    A symlink (POSIX) or copy (Windows) called `out/latest` always points
+    at the most recent run.
+    """
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    run_dir = outdir / f"run-{timestamp}"
+    run_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"[3/3] Running pipeline on {input_file.name} ...")
-    run([
-        venv_bin("amt"), input_file,
-        "--validate",
-        "--reason",
-        "--check",
-        "--export-ttl", ttl_out,
-        "--export-cypher", cypher_out,
-        "--export-html", html_out,
-    ])
-    print(f"\n✓ Outputs written to {outdir.resolve()}")
-    for p in (ttl_out, cypher_out, html_out):
+    # Run from inside the repo so amt's relative imports + ontology paths work,
+    # exactly as if you'd cloned it and run the runner by hand.
+    run(
+        [
+            sys.executable, "-m", "amt.runner", input_file,
+            "-o", run_dir.resolve(),
+        ],
+        cwd=REPO_DIR,
+    )
+
+    _update_latest_pointer(outdir, run_dir)
+
+    print(f"\n✓ Outputs written to {run_dir.resolve()}")
+    print(f"  (also accessible via {outdir.resolve() / 'latest'})")
+    for p in sorted(run_dir.glob(f"{input_file.stem}.*")):
         print(f"    - {p.name}")
+
+
+def _update_latest_pointer(outdir: Path, run_dir: Path) -> None:
+    """Make `out/latest` point at the run we just produced.
+
+    Uses a symlink on POSIX, a directory junction copy on Windows. Failure
+    is non-fatal — the pointer is convenience, not correctness.
+    """
+    latest = outdir / "latest"
+    try:
+        if latest.is_symlink() or latest.exists():
+            if latest.is_symlink() or latest.is_file():
+                latest.unlink()
+            else:
+                # Plain directory copy from a previous Windows run.
+                import shutil
+                shutil.rmtree(latest)
+        # Use a relative target so the pointer survives moving outdir/.
+        latest.symlink_to(run_dir.name, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        # Windows without dev-mode / admin → no symlinks. Fall back to a copy.
+        try:
+            import shutil
+            if latest.exists():
+                shutil.rmtree(latest)
+            shutil.copytree(run_dir, latest)
+        except Exception as e:
+            print(f"      (could not update '{latest.name}' pointer: {e})")
 
 
 # --------------------------------------------------------------------------- #
@@ -163,8 +187,7 @@ def main() -> int:
 
     try:
         ensure_repo(args.ref, args.update)
-        ensure_venv()
-        reinstall_if_repo_changed()
+        ensure_deps()
         run_pipeline(args.input.resolve(), args.outdir)
     except subprocess.CalledProcessError as e:
         print(f"\nFAIL  step failed (exit {e.returncode})", file=sys.stderr)
