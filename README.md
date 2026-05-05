@@ -314,3 +314,11 @@ once the corresponding setup is in place in the engine repository.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Acknowledgements
+
+AMT.engine is developed within
+[**mainzed**](https://www.mainzed.org/) — Mainzer Zentrum für Digitalität
+in den Geistes- und Kulturwissenschaften — at
+[Hochschule Mainz, i3mainz](https://i3mainz.hs-mainz.de/)
+and the [Leibniz-Zentrum für Archäologie (LEIZA)](https://www.leiza.de/).
