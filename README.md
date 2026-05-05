@@ -32,7 +32,7 @@ That's it. The script bootstraps everything else.
 ## Quickstart
 
 ```bash
-git clone https://github.com/<your-user>/amt-runner.git
+git clone https://github.com/n4o-rse/amt-runner.git
 cd amt-runner
 python run_amt.py animals.ttl
 ```
