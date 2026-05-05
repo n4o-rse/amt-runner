@@ -322,3 +322,8 @@ AMT.engine is developed within
 in den Geistes- und Kulturwissenschaften — at
 [Hochschule Mainz, i3mainz](https://i3mainz.hs-mainz.de/)
 and the [Leibniz-Zentrum für Archäologie (LEIZA)](https://www.leiza.de/).
+
+This work is part of the DFG-funded NFDI initiative, specifically the
+[Research Data Infrastructure for the Material Remains of Human History
+(NFDI4Objects)](https://www.nfdi4objects.net/) — DFG project number
+**501836407**.
