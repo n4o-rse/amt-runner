@@ -87,25 +87,40 @@ def ensure_repo(ref: str, update: bool) -> None:
         print(f"[1/3] Using cached amt.engine at {REPO_DIR}")
 
     _checkout(ref)
-
-    if update:
-        # Only meaningful on a branch; on a detached HEAD it is a no-op.
-        _git("pull", "--ff-only", check=False, quiet=True)
-
     print(f"      engine ref '{ref}' at {_describe_head()}")
+
+
+def _rev_exists(rev: str) -> bool:
+    """Whether ``rev`` resolves in the cached repo."""
+    return subprocess.run(
+        ["git", "-C", str(REPO_DIR), "rev-parse", "--verify", "--quiet", rev],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    ).returncode == 0
 
 
 def _checkout(ref: str) -> None:
     """
-    Check out ``ref``, deepening the shallow clone if the ref is not in it.
+    Check out ``ref``, preferring the remote-tracking branch and deepening
+    the shallow clone when the ref is not in it.
 
-    The initial clone is ``--depth 1``, so it contains exactly one commit.
-    Any tag, branch or SHA other than the tip of the default branch is
-    therefore simply absent, and a plain checkout fails. Rather than
-    surfacing that as an opaque non-zero exit, fetch the missing history
-    once and retry.
+    Two things make this less trivial than ``git checkout``.
+
+    The cache is a disposable mirror, so the *remote* state is always what
+    we want. A local branch left over from an earlier run points at
+    whatever was the tip back then, and merely fetching does not move it.
+    Fast-forwarding it is not an option either: in a shallow clone the old
+    local branch and the new remote tip share no visible ancestor, so git
+    calls the histories diverging and ``pull --ff-only`` aborts. Checking
+    out ``origin/<ref>`` detached sidesteps the whole question — there is
+    no local branch to go stale.
+
+    And the initial clone is ``--depth 1``, so a tag or SHA other than the
+    tip of the default branch is simply absent. Rather than surfacing that
+    as an opaque non-zero exit, fetch the missing history once and retry.
     """
-    if _git("checkout", ref, check=False, quiet=True) == 0:
+    target = f"origin/{ref}" if _rev_exists(f"refs/remotes/origin/{ref}") else ref
+
+    if _git("checkout", "--detach", target, check=False, quiet=True) == 0:
         return
 
     print(f"      '{ref}' not in the shallow clone — fetching full history ...")
@@ -113,7 +128,8 @@ def _checkout(ref: str) -> None:
     _git("fetch", "--unshallow", "--tags", check=False, quiet=True)
     _git("fetch", "--all", "--tags", check=False, quiet=True)
 
-    if _git("checkout", ref, check=False) != 0:
+    target = f"origin/{ref}" if _rev_exists(f"refs/remotes/origin/{ref}") else ref
+    if _git("checkout", "--detach", target, check=False) != 0:
         raise SystemExit(
             f"FAIL  '{ref}' is not a tag, branch or commit of {AMT_REPO_URL}.\n"
             f"      Check the ref, or delete {CACHE_DIR} and try again."
@@ -298,8 +314,11 @@ def main() -> int:
             if not engine_supports("--minimal"):
                 print(
                     "FAIL  The cached AMT.engine does not support --minimal.\n"
-                    "      It arrived in 0.3.0. Re-run with --update, or pin a\n"
-                    "      newer ref with --ref.",
+                    "      It arrived in 0.3.0, and the copy in\n"
+                    f"      {REPO_DIR}\n"
+                    "      is older than that. Re-run the same command with\n"
+                    "      --update to fetch a current engine, or delete the\n"
+                    "      cache directory and let the next run re-clone it.",
                     file=sys.stderr,
                 )
                 return 2

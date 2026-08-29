@@ -251,7 +251,7 @@ specification see the [AMT.engine README](https://github.com/n4o-rse/amt-engine)
 | `--outdir DIR` | `out/` | Parent directory for run subfolders |
 | `--minimal` | off | Suppress inferred edges implied by a finer role (needs engine ≥ 0.3.0) |
 | `--ref REF` | `main` | Pin AMT.engine to a tag, branch, or commit SHA |
-| `--update` | off | Fetch the latest cached engine before running |
+| `--update` | off | Fetch the current engine before running |
 
 Everything else is forwarded to `amt.runner` — `--no-check`, `--no-report`,
 `--no-info`, `--height`, and whatever the engine gains next.
@@ -267,6 +267,25 @@ python run_amt.py animals.ttl --ref a50822cd758ca8b23dfdb373bcc987ba92e0e51d
 ```
 
 Pin a SHA rather than `main` for anything whose results you intend to cite.
+
+## Keeping the cached engine current
+
+The cache is a disposable mirror of the engine, cloned once and reused. It
+does **not** update itself — a cache created months ago keeps running that
+version of the engine, silently, until you ask for something it cannot do.
+Every run prints the commit it used, which is how you notice.
+
+```bash
+python run_amt.py animals.ttl --update
+```
+
+`--update` fetches and checks out the current `origin/main`. If a feature
+you asked for is missing from the cached engine — `--minimal`, say — the
+script says so and names `--update` rather than letting the engine fail with
+an argument error. Deleting `.amt-cache/` works too; the next run re-clones.
+
+The cache is always checked out detached at the exact remote commit, so
+there is no local branch to fall behind.
 
 Every run prints which commit it used, so the run report and the engine
 revision can be matched up later.
@@ -367,16 +386,3 @@ once the corresponding setup is in place in the engine repository.
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-## Acknowledgements
-
-AMT.engine is developed within
-[**mainzed**](https://www.mainzed.org/) — Mainzer Zentrum für Digitalität
-in den Geistes- und Kulturwissenschaften — at
-[Hochschule Mainz, i3mainz](https://i3mainz.hs-mainz.de/)
-and the [Leibniz-Zentrum für Archäologie (LEIZA)](https://www.leiza.de/).
-
-This work is part of the DFG-funded NFDI initiative, specifically the
-[Research Data Infrastructure for the Material Remains of Human History
-(NFDI4Objects)](https://www.nfdi4objects.net/) — DFG project number
-**501836407**.
