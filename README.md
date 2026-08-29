@@ -13,10 +13,10 @@ for your own AMT-based projects.
 `run_amt.py` is a self-contained Python script that:
 
 1. **Clones AMT.engine** from GitHub into a local cache (`.amt-cache/`)
-2. **Installs three dependencies** (`rdflib`, `pyshacl`, `pyvis`) into your active Python — once
+2. **Installs its dependencies** into your active Python — once, from the engine's own `requirements.txt`
 3. **Runs `amt.runner`** — the engine's own full-pipeline entry point — into a fresh, timestamped folder:
    - SHACL validation against the AMT shapes
-   - Fuzzy-logic reasoning (n-ary role chains, inverse roles)
+   - Fuzzy-logic reasoning (n-ary role chains, inverse roles, role subsumption)
    - Consistency check
    - Export to Turtle, Neo4j Cypher, two CSVs (nodes/edges), interactive HTML graph
    - A Markdown run report documenting the whole run
@@ -31,8 +31,8 @@ and runs against different input files don't collide.
 
 ## A note on Python environments
 
-The script installs `rdflib`, `pyshacl`, and `pyvis` into whatever Python you
-use to run it. If you don't want them in your global Python, create a venv
+The script installs the engine's dependencies (currently `rdflib`, `pyshacl`
+and `pyvis`) into whatever Python you use to run it. If you don't want them in your global Python, create a venv
 first:
 
 ```bash
@@ -55,7 +55,7 @@ cd amt-runner
 python run_amt.py animals.ttl
 ```
 
-The first run downloads AMT.engine and installs its three dependencies. Allow
+The first run downloads AMT.engine and installs its dependencies. Allow
 roughly 30 seconds on Windows, less on Linux/Mac. Subsequent runs are
 near-instant.
 
@@ -156,8 +156,9 @@ the top of `animals.ttl` for the full reasoning.
 
 ```
 [1/3] Cloning https://github.com/n4o-rse/amt-engine.git ...
+      engine ref 'main' at a50822c Merge branch 'main' of ...
 [2/3] Installing dependencies into /path/to/python
-      (rdflib>=7.0, pyshacl>=0.25, pyvis>=0.3)
+      (from the engine's own requirements.txt)
 [3/3] Running pipeline on animals.ttl ...
 VAL  Validating animals.ttl ...
 OK   Validation passed.
@@ -228,8 +229,18 @@ python run_amt.py my-data.ttl
 python run_amt.py path/to/my-data.ttl --outdir results/
 ```
 
+Flags the wrapper does not recognise go straight through to `amt.runner`,
+so anything the engine's own CLI accepts works here too:
+
+```bash
+python run_amt.py my-data.ttl --no-check --height 900px
+```
+
+The one exception is `-o` / `--outdir`: that belongs to the wrapper, which
+manages the per-run subfolder itself.
+
 Your file needs to follow the AMT vocabulary — Concepts, Roles, weighted edges,
-and (optionally) RoleChainAxioms or InverseRoleAxioms. The bundled
+and (optionally) RoleChainAxioms, InverseAxioms or SubsumptionAxioms. The bundled
 [`animals.ttl`](animals.ttl) is the most complete worked example; for the formal
 specification see the [AMT.engine README](https://github.com/n4o-rse/amt-engine).
 
@@ -238,14 +249,53 @@ specification see the [AMT.engine README](https://github.com/n4o-rse/amt-engine)
 | Flag | Default | Effect |
 |---|---|---|
 | `--outdir DIR` | `out/` | Parent directory for run subfolders |
+| `--minimal` | off | Suppress inferred edges implied by a finer role (needs engine ≥ 0.3.0) |
 | `--ref REF` | `main` | Pin AMT.engine to a tag, branch, or commit SHA |
-| `--update` | off | `git pull` the cached engine before running |
+| `--update` | off | Fetch the latest cached engine before running |
 
-Pinning to a release tag is the right move for reproducible pipelines:
+Everything else is forwarded to `amt.runner` — `--no-check`, `--no-report`,
+`--no-info`, `--height`, and whatever the engine gains next.
+
+Pinning is the right move for reproducible pipelines. Branches, commit SHAs
+and (once the engine starts publishing them) tags all work. The cache is
+cloned shallow, so a ref other than the tip of `main` is not in it at first;
+the script notices and fetches the rest of the history on demand rather than
+failing:
 
 ```bash
-python run_amt.py animals.ttl --ref v0.2.0
+python run_amt.py animals.ttl --ref a50822cd758ca8b23dfdb373bcc987ba92e0e51d
 ```
+
+Pin a SHA rather than `main` for anything whose results you intend to cite.
+
+Every run prints which commit it used, so the run report and the engine
+revision can be matched up later.
+
+## Role subsumption and `--minimal`
+
+AMT.engine 0.3.0 added `amt:SubsumptionAxiom`, for vocabularies whose roles
+are *sets* of finer roles — Freksa's semi-interval relations, for instance,
+where `ob` = {`<`, `m`, `o`} is contained in `ol` = {`<`, `m`, `o`, `fi`,
+`di`}. Without it, a reasoner derives every member of such a chain
+independently: all true, all but the finest redundant.
+
+By default the engine spells the hierarchy out, so that a tool consuming the
+Cypher or the CSVs without knowing the role hierarchy still sees every edge.
+`--minimal` does the opposite: it drops an inferred edge when a finer edge
+relates the same pair at no lower weight.
+
+```bash
+python run_amt.py subsumption-demo.ttl            # 8 asserted → 18 edges
+python run_amt.py subsumption-demo.ttl --minimal  # 8 asserted → 11 edges
+```
+
+Both runs land in their own `out/run-.../` folder, so the two
+`subsumption-demo.edges.csv` files can be diffed directly.
+[`subsumption-demo.md`](subsumption-demo.md) documents every derivation and
+explains why one coarse edge survives `--minimal` while another does not.
+
+Files without subsumption axioms — including `animals.ttl` — produce
+identical output in both modes.
 
 ## Repository layout
 
@@ -253,6 +303,7 @@ python run_amt.py animals.ttl --ref v0.2.0
 amt-runner/
 ├── run_amt.py          # the wrapper script
 ├── animals.ttl         # demo input
+├── subsumption-demo.ttl  # demo input for --minimal
 ├── README.md
 ├── .gitignore
 ├── .amt-cache/         # created on first run, git-ignored
@@ -293,10 +344,12 @@ the engine's own full-pipeline entry point. All this wrapper does is solve
 the "how do I get the engine onto my machine and pointed at my file"
 problem, plus organising outputs into per-run subfolders so nothing gets
 overwritten. When AMT.engine adds a new export format or pipeline step, this
-wrapper picks it up automatically.
+wrapper picks it up automatically — and because unrecognised flags are
+forwarded verbatim, a new engine option is usable here before this script
+has ever heard of it.
 
 The script also avoids the heavyweight `pip install -e .` that an editable
-install would require. It just installs the three runtime dependencies into
+install would require. It just installs the engine's runtime dependencies into
 your active Python and runs `python -m amt.runner` from inside the cloned
 repo — exactly what you'd do if you cloned and ran the engine by hand. If
 you want isolation, put the script in a venv yourself.
