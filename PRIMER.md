@@ -26,7 +26,7 @@ Die Schrittnummern gelten für dieses Repo. Im Primer von `amt-engine` heißt de
 - Sieben von acht kopierten Beispieldateien sind byte-identisch mit `amt-engine/examples/`. `subsumption-demo.md` weicht gewollt ab (Befehle `python run_amt.py …` statt `python -m amt.runner …`, ein Absatz zu `out/run-…`).
 - Ein End-to-End-Lauf (`python run_amt.py animals.ttl`, Linux, Python 3.13, Engine von GitHub) erzeugt wie in der README beschrieben 106 abgeleitete Kanten und sechs Ausgabedateien.
 - Das Layout in der README nannte nur `animals.ttl` und `subsumption-demo.ttl`, obwohl auch die Potter- und SKOS-Beispiele im Repo liegen. Das Pin-Beispiel nannte noch `a50822c`. Beides korrigiert in S1.
-- `LICENSE` nennt „NFDI4Objects | Research Software Engineering Projects“, die der Engine „Florian Thiery | LEIZA | NFDI4Objects“. Gehört zu S3.
+- `LICENSE` nannte „NFDI4Objects | Research Software Engineering Projects“, die der Engine „Florian Thiery | LEIZA | NFDI4Objects“. Geklärt in S3 (A4).
 - Das Repo `amt-runner` und der Befehl `amt-runner` der Engine heißen gleich und meinen Verschiedenes: das eine klont und installiert, das andere ist die Pipeline selbst.
 - Die Fehler aus 0.2.0 (veralteter lokaler Branch im flachen Klon, Tag oder SHA nicht im flachen Verlauf) waren nicht durch Tests abgedeckt. S1 legt sie fest; die Tests schlagen an, wenn man das Nachladen der Historie oder das Auschecken von `origin/<ref>` entfernt (geprüft per Mutation).
 
@@ -77,7 +77,8 @@ Eigenschaften, die das Repo haben muss:
 | `requirements.txt` | genau eine Datei pro Repo; hier nur Kommentar (Laufzeit = Standardbibliothek) plus `pytest` für die Entwicklung | 2026-10-26 |
 | Engine-Pin | Standard bleibt `main`; das README-Beispiel zeigt `41620dd`; Pin auf Tags erst nach S5 (engine) | 2026-10-26 |
 | Ort des Pipeline-Reports | `build/pipeline_report.txt`, ignoriert | 2026-10-26 |
-| Autoren in `CITATION.cff` | nur Florian Thiery, ohne ORCID, bis die Liste geklärt ist | Vorschlag 2026-10-26 |
+| Autoren in `CITATION.cff` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
+| Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, wie in `amt-engine` | 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version geliefert hat (0.2.0: 2026-08-29) | Vorschlag 2026-10-26 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
@@ -111,7 +112,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S0 | Festlegungen: Version, Dev-Schritte, requirements, Engine-Pin | amt-runner | – | erledigt 2026-10-26 |
 | S1 | Skeleton: `PRIMER.md`, `main.py`, `py/`, `tests/`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, README | amt-runner | S0 | erledigt 2026-10-26 |
 | S2 | Netz-Schritte `smoke` und `drift` (eigene Verben, nie im Standardlauf) | amt-runner | S1 | offen |
-| S3 | `CITATION.cff` und `LICENSE`: Autorenliste und Rechteinhaber klären | amt-engine, amt-runner | S1 | offen |
+| S3 | `CITATION.cff` und `LICENSE`: Autorenliste und Rechteinhaber klären | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | offen |
 | S5 | Tag `v0.1.0`, `v0.2.0` setzen, Release, Zenodo-DOI | amt-runner | S3 | offen |
 
@@ -142,7 +143,21 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 - Gegenprobe der Tests per Mutation: Entfernt man das Nachladen der Historie, schlägt `test_commit_sha_outside_shallow_history_is_resolved` an; entfernt man den Fehlerzweig für unbekannte Refs, schlägt `test_unknown_ref_exits_with_a_message` an; ersetzt man `origin/<ref>` durch den lokalen Branch, schlägt `test_update_follows_the_remote_tip` an. Ein erster Entwurf des SHA-Tests nahm einen getaggten Commit und hätte die erste Mutation nicht bemerkt; deshalb gibt es den untaggten Zwischencommit.
 - `meta` und `tests` laufen in unter drei Sekunden.
-- Windows ist noch nicht geprüft; erster Lauf dort: `python main.py --strict`.
+- Windows bestätigt am 2026-10-26 (Commit `021dc1d`, Python 3.10): `python main.py --strict` endet grün, 11 Tests in 23 s.
+
+---
+
+## S3 – Autoren und Rechteinhaber klären
+
+**Ziel:** `CITATION.cff` und `LICENSE` stimmen mit `amt-engine` überein.
+
+**Uploads:** `PRIMER.md`; Entscheidungen aus dem Formular im Engine-Chat (Details im Primer von `amt-engine`, S3).
+
+**Abnahme:** `python main.py --strict` grün, zweimal hintereinander, `git status` sauber; `LICENSE` nennt denselben Rechteinhaber wie die Engine.
+
+### Erledigt 2026-10-26
+
+- Zusammen mit dem Engine-Patch ausgeliefert; die Entscheidungen stehen in A4.
 
 ---
 

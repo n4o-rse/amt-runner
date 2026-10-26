@@ -24,11 +24,14 @@ delivered the change.
   tag and commit outside the shallow history, `--update`, unknown ref), the
   dependency fingerprint, feature detection, argument forwarding and the
   `out/latest` pointer. A local git repository stands in for the engine.
-- `CITATION.cff`, `requirements.txt` (development only; the runner itself needs
+- `CITATION.cff` (authors Florian Thiery and Allard W. Mees, with ORCIDs), `requirements.txt` (development only; the runner itself needs
   just the standard library) and this changelog.
 
 ### Changed
 
+- `LICENSE`: the copyright holder reads "Florian Thiery | LEIZA | Research
+  Squirrel Engineers Network" (was "NFDI4Objects | Research Software
+  Engineering Projects"), the same as in AMT.engine.
 - `README.md`: the layout lists every bundled example, the pinning example uses
   the engine commit `41620dd`, and a "Development" section describes `main.py`.
 - `.gitignore`: also ignores `build/`, `.pytest_cache/` and `PATCH-README.md`.
