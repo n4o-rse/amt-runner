@@ -77,6 +77,8 @@ Eigenschaften, die das Repo haben muss:
 | `requirements.txt` | genau eine Datei pro Repo; hier nur Kommentar (Laufzeit = Standardbibliothek) plus `pytest` für die Entwicklung | 2026-10-26 |
 | Engine-Pin | Standard bleibt `main`; das README-Beispiel zeigt `41620dd`; Pin auf Tags erst nach S5 (engine) | 2026-10-26 |
 | Ort des Pipeline-Reports | `build/pipeline_report.txt`, ignoriert | 2026-10-26 |
+| `pytest` aus der Engine-`requirements.txt` | darf mitinstalliert werden (Engine-S6); keine zweite Liste im Runner | 2026-10-26 |
+| Versionen der GitHub Actions | `checkout@v5`, `setup-python@v6`, `upload-artifact@v5` (Node 24), wie in `amt-engine` | 2026-10-26 |
 | CI-Matrix | Ubuntu und Windows, Python 3.10 und 3.13; Auslöser Push auf `main`, Pull Request und manuell; nur `python main.py --strict` (meta, tests; ohne Netz), kein Smoke-Lauf | 2026-10-26 |
 | Autoren in `CITATION.cff` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, wie in `amt-engine` | 2026-10-26 |
@@ -181,5 +183,5 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D2** Netz-Schritt `drift`: Vergleich der kopierten Beispiele mit `amt-engine/examples/` (Zeilenenden normalisiert). Ohne ihn fällt Auseinanderlaufen erst auf, wenn jemand es bemerkt. Sieben von acht Dateien sind heute identisch.
 - **D3** Namensgleichheit Repo `amt-runner` und Engine-Befehl `amt-runner`: umbenennen oder in der README klar trennen?
 - **D4** Die README verweist unter „Related“ auf `leiza-scit/CAA2026-amt` und sagt, eine GitHub-Pages-Veröffentlichung sei geplant. Beides prüfen, ob es noch stimmt.
-- **D5** Engine-Primer, Beschluss vom 2026-10-26 („eine `requirements.txt` pro Repo“): `amt-engine` hat heute zusätzlich `requirements-dev.txt`. Fasst man beide zusammen, installiert dieser Runner beim Start auch `pytest`, weil er die Datei der Engine verwendet. Entscheidung dort (Schritt S6).
+- **D5** erledigt 2026-10-26 (Engine-S6): `pytest` darf mitkommen. Ausgangslage: Engine-Primer, Beschluss vom 2026-10-26 („eine `requirements.txt` pro Repo“); `amt-engine` hatte zusätzlich `requirements-dev.txt`. Fasst man beide zusammen, installiert dieser Runner beim Start auch `pytest`, weil er die Datei der Engine verwendet. Entscheidung dort (Schritt S6).
 - **D6** Der Engine-Aufruf aus `run_amt.py` liefert bei Konsistenzverletzungen Exit-Code 0 (siehe Engine-Primer, D6); der Wrapper reicht ihn unverändert durch.

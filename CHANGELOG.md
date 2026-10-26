@@ -32,6 +32,8 @@ delivered the change.
 
 ### Changed
 
+- The CI workflow uses `actions/checkout@v5`, `actions/setup-python@v6` and
+  `actions/upload-artifact@v5`, which run on Node 24.
 - `LICENSE`: the copyright holder reads "Florian Thiery | LEIZA | Research
   Squirrel Engineers Network" (was "NFDI4Objects | Research Software
   Engineering Projects"), the same as in AMT.engine.

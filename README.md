@@ -13,7 +13,7 @@ for your own AMT-based projects.
 `run_amt.py` is a self-contained Python script that:
 
 1. **Clones AMT.engine** from GitHub into a local cache (`.amt-cache/`)
-2. **Installs its dependencies** into your active Python — once, from the engine's own `requirements.txt`
+2. **Installs its dependencies** into your active Python — once, from the engine's own `requirements.txt` (which also lists `pytest`, harmless here)
 3. **Runs `amt.runner`** — the engine's own full-pipeline entry point — into a fresh, timestamped folder:
    - SHACL validation against the AMT shapes
    - Fuzzy-logic reasoning (n-ary role chains, inverse roles, role subsumption)
