@@ -6,11 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/). The version
 describes `run_amt.py`, not the AMT.engine it runs.
 
-The repository carries no git tags. The entries for 0.1.0 and 0.2.0 were
-reconstructed from the commit history; each date is that of the commit that
-delivered the change.
+The entries for 0.1.0 and 0.2.0 were reconstructed from the commit history;
+each date is that of the commit that delivered the change. The tags `v0.1.0`
+and `v0.2.0` were set afterwards on exactly those commits. 0.2.1 is the first
+release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
+
+## [0.2.1] - 2026-10-26
+
+0.2.1 changes no behaviour of `run_amt.py`, apart from the new `__version__`
+constant. It adds the development pipeline, offline tests, citation metadata
+and continuous integration.
 
 ### Added
 
@@ -76,6 +83,7 @@ delivered the change.
   `PotterAttributionExample`, `SKOSconceptExample`.
 - README with quickstart, output layout and an expected-output walkthrough.
 
-[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/bab9ea8...HEAD
-[0.2.0]: https://github.com/n4o-rse/amt-runner/commit/445904c
+[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/n4o-rse/amt-runner/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/n4o-rse/amt-runner/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/n4o-rse/amt-runner/commit/fc8d18d

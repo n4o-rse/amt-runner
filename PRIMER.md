@@ -21,7 +21,7 @@ Die Schrittnummern gelten für dieses Repo. Im Primer von `amt-engine` heißt de
 
 **Befunde** (alle am 2026-10-26 geprüft, Stand `bab9ea8`; Engine beim Prüfen bei `41620dd`, inzwischen `b42b27b`):
 
-- Das Repo hat 11 Commits und keine Tags. Es gab keine Versionsangabe im Code; die Versionen 0.1.0 (2026-05-05) und 0.2.0 (2026-08-29) sind aus der Historie rekonstruiert.
+- Das Repo hatte 11 Commits und keine Tags. Es gab keine Versionsangabe im Code; die Versionen 0.1.0 (2026-05-05) und 0.2.0 (2026-08-29) sind aus der Historie rekonstruiert. Seit S5 tragen die Commits `fc8d18d` und `445904c` die Tags `v0.1.0` und `v0.2.0`.
 - `run_amt.py` braucht nur die Standardbibliothek. Die Pakete der Engine (`rdflib`, `pyshacl`, `pyvis`) kommen zur Laufzeit aus `requirements.txt` des Engine-Klons; die feste Liste im Skript ist nur der Rückfall für ältere Refs.
 - Sieben von acht kopierten Beispieldateien sind byte-identisch mit `amt-engine/examples/`. `subsumption-demo.md` weicht gewollt ab (Befehle `python run_amt.py …` statt `python -m amt.runner …`, ein Absatz zu `out/run-…`).
 - Ein End-to-End-Lauf (`python run_amt.py animals.ttl`, Linux, Python 3.13, Engine von GitHub) erzeugt wie in der README beschrieben 106 abgeleitete Kanten und sechs Ausgabedateien.
@@ -82,7 +82,9 @@ Eigenschaften, die das Repo haben muss:
 | CI-Matrix | Ubuntu und Windows, Python 3.10 und 3.13; Auslöser Push auf `main`, Pull Request und manuell; nur `python main.py --strict` (meta, tests; ohne Netz), kein Smoke-Lauf | 2026-10-26 |
 | Autoren in `CITATION.cff` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, wie in `amt-engine` | 2026-10-26 |
-| Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version geliefert hat (0.2.0: 2026-08-29) | Vorschlag 2026-10-26 |
+| Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version geliefert hat (0.2.0: 2026-08-29, 0.2.1: 2026-10-26) | 2026-10-26 |
+| Tags und Releases | `v0.1.0` und `v0.2.0` als annotierte Tags auf `fc8d18d` und `445904c`, ohne GitHub-Release; `v0.2.1` ist das erste Release (keine Verhaltensänderung außer der Konstante `__version__`) | 2026-10-26 |
+| Zenodo | GitHub-Zenodo-Anbindung ist eingeschaltet; nur das Release `v0.2.1` wird archiviert | 2026-10-26 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
 
@@ -117,9 +119,9 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S2 | Netz-Schritte `smoke` und `drift` (eigene Verben, nie im Standardlauf) | amt-runner | S1 | offen |
 | S3 | `CITATION.cff` und `LICENSE`: Autorenliste und Rechteinhaber klären | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | erledigt 2026-10-26 |
-| S5 | Tag `v0.1.0`, `v0.2.0` setzen, Release, Zenodo-DOI | amt-runner | S3 | offen |
+| S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | offen (5a erledigt 2026-10-26) |
 
-S2, S3 und S4 sind voneinander unabhängig; S5 wartet auf S3.
+S3 und S4 sind erledigt, S2 ist offen und unabhängig; S5 läuft in drei Teilen (5a Version 0.2.1 im Repo, 5b Tags und Release, 5c DOI eintragen).
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -174,6 +176,20 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 - Workflow mit `actionlint` geprüft; ein echter Lauf war hier nicht möglich.
 - Der Netz-Schritt `smoke` (D1) bleibt ein eigener Schritt; er gehört nicht in den Standardlauf und damit nicht in diese CI.
+
+## S5 – Tags, Release 0.2.1 und Zenodo-DOI
+
+**Ziel:** Wie in `amt-engine`: Tags für die bisherigen Versionen, ein erstes GitHub-Release `v0.2.1` und eine Zenodo-DOI in `CITATION.cff` und README.
+
+**Uploads:** Zwei Patches (5a, 5c) und manuelle Befehle für die Tags (5b); Entscheidungen aus dem Formular im Engine-Chat.
+
+**Teil 5a (Patch):** Version 0.2.1 in `run_amt.py`, `CITATION.cff`, `py/amt_runner_dev_utils.py` und `CHANGELOG.md`.
+
+**Teil 5b (manuell):** annotierte Tags `v0.1.0` auf `fc8d18d`, `v0.2.0` auf `445904c` und `v0.2.1` auf dem Commit von 5a; `git push origin --tags`; Release aus `v0.2.1` anlegen.
+
+**Teil 5c (Patch):** Zenodo-DOI eintragen.
+
+**Abnahme:** `python main.py --strict` grün; `git tag` zeigt drei Tags; „Releases“ zeigt `v0.2.1`; auf zenodo.org steht die Version; nach 5c nennt `CITATION.cff` die DOI.
 
 ---
 

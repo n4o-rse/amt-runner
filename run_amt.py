@@ -37,7 +37,7 @@ from pathlib import Path
 # Version of this wrapper, not of the engine it runs. It must equal the newest
 # released entry in CHANGELOG.md and `version` in CITATION.cff; `python main.py`
 # checks all three.
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 # --------------------------------------------------------------------------- #
 # Configuration
