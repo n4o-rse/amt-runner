@@ -417,6 +417,20 @@ plan and the decisions behind the repository.
 A GitHub Pages publication of `animals.html` and similar examples is planned
 once the corresponding setup is in place in the engine repository.
 
+## Citation
+
+If you use amt-runner in your work, please cite it. The citation metadata are in
+[`CITATION.cff`](CITATION.cff); GitHub offers them under "Cite this repository".
+Every release is archived on Zenodo.
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23669557.svg)](https://doi.org/10.5281/zenodo.23669557)
+
+- All versions (always resolves to the latest): <https://doi.org/10.5281/zenodo.23669557>
+- Version 0.2.1: <https://doi.org/10.5281/zenodo.23669558>
+
+Use the version DOI when you need to name the exact release your results
+came from.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

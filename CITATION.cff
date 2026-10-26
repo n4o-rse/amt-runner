@@ -21,7 +21,7 @@ license: MIT
 version: "0.2.1"
 date-released: "2026-10-26"
 repository-code: "https://github.com/n4o-rse/amt-runner"
-# doi: "10.5281/zenodo.XXXXXXX"  # TODO: add Zenodo DOI once minted
+doi: "10.5281/zenodo.23669557"  # concept DOI: stands for all versions and resolves to the latest
 keywords:
   - Academic Meta Tool
   - fuzzy logic

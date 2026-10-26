@@ -13,6 +13,12 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+### Added
+
+- The Zenodo DOI `10.5281/zenodo.23669557` (all versions) in `CITATION.cff`,
+  and a "Citation" section with the DOI badge in `README.md`. Release 0.2.1
+  itself is archived as `10.5281/zenodo.23669558`.
+
 ## [0.2.1] - 2026-10-26
 
 0.2.1 changes no behaviour of `run_amt.py`, apart from the new `__version__`

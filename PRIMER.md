@@ -84,6 +84,7 @@ Eigenschaften, die das Repo haben muss:
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, wie in `amt-engine` | 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version geliefert hat (0.2.0: 2026-08-29, 0.2.1: 2026-10-26) | 2026-10-26 |
 | Tags und Releases | `v0.1.0` und `v0.2.0` als annotierte Tags auf `fc8d18d` und `445904c`, ohne GitHub-Release; `v0.2.1` ist das erste Release (keine Verhaltensänderung außer der Konstante `__version__`) | 2026-10-26 |
+| DOI | Concept-DOI `10.5281/zenodo.23669557` steht in `CITATION.cff` und README; Version 0.2.1 trägt `10.5281/zenodo.23669558` | 2026-10-26 |
 | Zenodo | GitHub-Zenodo-Anbindung ist eingeschaltet; nur das Release `v0.2.1` wird archiviert | 2026-10-26 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
@@ -119,9 +120,9 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S2 | Netz-Schritte `smoke` und `drift` (eigene Verben, nie im Standardlauf) | amt-runner | S1 | offen |
 | S3 | `CITATION.cff` und `LICENSE`: Autorenliste und Rechteinhaber klären | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | erledigt 2026-10-26 |
-| S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | offen (5a erledigt 2026-10-26) |
+| S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | erledigt 2026-10-26 |
 
-S3 und S4 sind erledigt, S2 ist offen und unabhängig; S5 läuft in drei Teilen (5a Version 0.2.1 im Repo, 5b Tags und Release, 5c DOI eintragen).
+S3, S4 und S5 sind erledigt; S2 ist offen.
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -190,6 +191,13 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 **Teil 5c (Patch):** Zenodo-DOI eintragen.
 
 **Abnahme:** `python main.py --strict` grün; `git tag` zeigt drei Tags; „Releases“ zeigt `v0.2.1`; auf zenodo.org steht die Version; nach 5c nennt `CITATION.cff` die DOI.
+
+### Erledigt 2026-10-26
+
+- 5a: Commit `310ae81` (Version 0.2.1); Windows-Lauf grün (11 Tests in 18 s).
+- 5b: Tags `v0.1.0`, `v0.2.0`, `v0.2.1` gesetzt und gepusht, GitHub-Release `v0.2.1` angelegt.
+- Zenodo: Version `10.5281/zenodo.23669558`, Concept-DOI `10.5281/zenodo.23669557`; Autoren mit ORCID aus `CITATION.cff`.
+- 5c: DOI in `CITATION.cff`, Abschnitt „Citation“ im README, CHANGELOG unter `[Unreleased]`.
 
 ---
 
