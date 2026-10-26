@@ -77,6 +77,7 @@ Eigenschaften, die das Repo haben muss:
 | `requirements.txt` | genau eine Datei pro Repo; hier nur Kommentar (Laufzeit = Standardbibliothek) plus `pytest` für die Entwicklung | 2026-10-26 |
 | Engine-Pin | Standard bleibt `main`; das README-Beispiel zeigt `41620dd`; Pin auf Tags erst nach S5 (engine) | 2026-10-26 |
 | Ort des Pipeline-Reports | `build/pipeline_report.txt`, ignoriert | 2026-10-26 |
+| CI-Matrix | Ubuntu und Windows, Python 3.10 und 3.13; Auslöser Push auf `main`, Pull Request und manuell; nur `python main.py --strict` (meta, tests; ohne Netz), kein Smoke-Lauf | 2026-10-26 |
 | Autoren in `CITATION.cff` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, wie in `amt-engine` | 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version geliefert hat (0.2.0: 2026-08-29) | Vorschlag 2026-10-26 |
@@ -113,7 +114,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S1 | Skeleton: `PRIMER.md`, `main.py`, `py/`, `tests/`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, README | amt-runner | S0 | erledigt 2026-10-26 |
 | S2 | Netz-Schritte `smoke` und `drift` (eigene Verben, nie im Standardlauf) | amt-runner | S1 | offen |
 | S3 | `CITATION.cff` und `LICENSE`: Autorenliste und Rechteinhaber klären | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
-| S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | offen |
+| S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | erledigt 2026-10-26 |
 | S5 | Tag `v0.1.0`, `v0.2.0` setzen, Release, Zenodo-DOI | amt-runner | S3 | offen |
 
 S2, S3 und S4 sind voneinander unabhängig; S5 wartet auf S3.
@@ -159,11 +160,24 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 - Zusammen mit dem Engine-Patch ausgeliefert; die Entscheidungen stehen in A4.
 
+## S4 – CI mit GitHub Actions
+
+**Ziel:** Jeder Push auf `main` und jeder Pull Request läuft durch `python main.py --strict`, auf Linux und Windows.
+
+**Uploads:** `PRIMER.md`, `README.md`, `CHANGELOG.md`; Entscheidungen aus dem Formular im Engine-Chat (siehe dort, S4).
+
+**Abnahme:** Nach dem Push zeigt der Reiter „Actions“ den Lauf `CI` mit vier grünen Jobs.
+
+### Erledigt 2026-10-26
+
+- Workflow mit `actionlint` geprüft; ein echter Lauf war hier nicht möglich.
+- Der Netz-Schritt `smoke` (D1) bleibt ein eigener Schritt; er gehört nicht in den Standardlauf und damit nicht in diese CI.
+
 ---
 
 ## Teil D – Offene Punkte
 
-- **D1** Netz-Schritt `smoke` (Engine klonen, `animals.ttl` durchlaufen lassen): eigenes Verb, nie im Standardlauf. Lohnt sich, sobald S4 (CI) läuft.
+- **D1** Netz-Schritt `smoke` (Engine klonen, `animals.ttl` durchlaufen lassen): eigenes Verb, nie im Standardlauf. S4 (CI) läuft jetzt; ein Smoke-Job wäre ein eigener, bewusst gewählter Schritt (braucht Netz und ist langsamer).
 - **D2** Netz-Schritt `drift`: Vergleich der kopierten Beispiele mit `amt-engine/examples/` (Zeilenenden normalisiert). Ohne ihn fällt Auseinanderlaufen erst auf, wenn jemand es bemerkt. Sieben von acht Dateien sind heute identisch.
 - **D3** Namensgleichheit Repo `amt-runner` und Engine-Befehl `amt-runner`: umbenennen oder in der README klar trennen?
 - **D4** Die README verweist unter „Related“ auf `leiza-scit/CAA2026-amt` und sagt, eine GitHub-Pages-Veröffentlichung sei geplant. Beides prüfen, ob es noch stimmt.

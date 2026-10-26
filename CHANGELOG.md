@@ -24,6 +24,9 @@ delivered the change.
   tag and commit outside the shallow history, `--update`, unknown ref), the
   dependency fingerprint, feature detection, argument forwarding and the
   `out/latest` pointer. A local git repository stands in for the engine.
+- `.github/workflows/ci.yml`: runs `python main.py --strict` on push to `main`
+  and on pull requests, on Ubuntu and Windows with Python 3.10 and 3.13, and
+  keeps `build/pipeline_report.txt` of each job as an artefact.
 - `CITATION.cff` (authors Florian Thiery and Allard W. Mees, with ORCIDs), `requirements.txt` (development only; the runner itself needs
   just the standard library) and this changelog.
 

@@ -332,6 +332,7 @@ amt-runner/
 ├── CHANGELOG.md
 ├── CITATION.cff
 ├── requirements.txt    # development only; run_amt.py needs the standard library
+├── .github/workflows/  # ci.yml: main.py --strict on push and pull request
 ├── README.md
 ├── .gitignore
 ├── .amt-cache/         # created on first run, git-ignored
@@ -397,6 +398,10 @@ python main.py --only tests        # one step
 python main.py --dry-run           # print the plan, run nothing
 python main.py --strict            # warnings become errors (use this in CI)
 ```
+
+GitHub Actions runs `python main.py --strict` on every push to `main` and on
+every pull request (`.github/workflows/ci.yml`), on Linux and Windows with
+Python 3.10 and 3.13. It needs no network beyond installing `pytest`.
 
 The combined output is written to `build/pipeline_report.txt`. Changes are
 recorded in [`CHANGELOG.md`](CHANGELOG.md); `PRIMER.md` holds the (German) work
