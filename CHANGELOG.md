@@ -15,9 +15,24 @@ release published on GitHub and archived on Zenodo.
 
 ### Added
 
+- Two development steps that need the network and run only on request:
+  `python main.py --only smoke` (runs `run_amt.py animals.ttl` end to end) and
+  `python main.py --only drift` (compares the bundled examples with the
+  engine's). Neither is part of the default run.
+- `.github/workflows/network.yml`: runs both weekly (Sundays) and on request.
+- Offline tests for the decisions behind the two steps.
+- README: a note that the repository and the engine's command are both called
+  amt-runner, and a pinning example with the tag `v0.3.1`.
 - The Zenodo DOI `10.5281/zenodo.23669557` (all versions) in `CITATION.cff`,
   and a "Citation" section with the DOI badge in `README.md`. Release 0.2.1
   itself is archived as `10.5281/zenodo.23669558`.
+
+### Changed
+
+- README "Related": the AMT Explorer of the engine is linked, the planned GitHub
+  Pages publication is no longer announced as future (it is live), and
+  CAA2026-amt is described as a related viewer instead of one that consumes the
+  same Turtle format.
 
 ## [0.2.1] - 2026-10-26
 

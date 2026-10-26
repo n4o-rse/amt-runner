@@ -1,0 +1,44 @@
+name: Network checks
+
+# The two steps of main.py that need the network, kept out of the normal CI:
+#   smoke  runs run_amt.py animals.ttl end to end (clones AMT.engine from main)
+#   drift  compares the bundled examples with AMT.engine's examples/
+# They run once a week and on request, never on push, because they depend on
+# the current state of another repository. A red run here means the engine (or
+# the bundled copies) changed, not that this repository broke.
+
+on:
+  schedule:
+    - cron: "17 5 * * 0"   # Sundays, 05:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  network:
+    name: smoke and drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Drift - bundled examples against the engine
+        run: python main.py --only drift --strict
+
+      - name: Smoke - run_amt.py end to end
+        if: success() || failure()
+        run: python main.py --only smoke --strict
+
+      - name: Keep the pipeline report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: network-report
+          path: build/pipeline_report.txt
+          if-no-files-found: ignore

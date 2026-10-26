@@ -8,6 +8,11 @@ This repo is meant as a **demo template**: clone it, drop in your own `.ttl` fil
 run the script, get the full set of outputs in `out/`. Use it as a starting point
 for your own AMT-based projects.
 
+> **Two things called amt-runner.** This repository is a wrapper that fetches the
+> engine and runs it for you. The engine itself also has a command called
+> `amt-runner` (`python -m amt.runner`), which is the pipeline this wrapper calls.
+> The wrapper is `run_amt.py`; the engine's command needs the engine installed.
+
 ## What it does
 
 `run_amt.py` is a self-contained Python script that:
@@ -257,16 +262,19 @@ Everything else is forwarded to `amt.runner` — `--no-check`, `--no-report`,
 `--no-info`, `--height`, and whatever the engine gains next.
 
 Pinning is the right move for reproducible pipelines. Branches, commit SHAs
-and (once the engine starts publishing them) tags all work. The cache is
+and tags all work; the engine publishes a tag for every release (`v0.3.1` is
+the first one that is archived on Zenodo). The cache is
 cloned shallow, so a ref other than the tip of `main` is not in it at first;
 the script notices and fetches the rest of the history on demand rather than
 failing:
 
 ```bash
+python run_amt.py animals.ttl --ref v0.3.1
 python run_amt.py animals.ttl --ref 41620dd1e9f57bfbb3f4db543853aec8ecd2a906
 ```
 
-Pin a SHA rather than `main` for anything whose results you intend to cite.
+Pin a tag or a SHA rather than `main` for anything whose results you intend to
+cite. The default stays `main`, so a plain run always uses the current engine.
 
 ## Keeping the cached engine current
 
@@ -332,7 +340,8 @@ amt-runner/
 ├── CHANGELOG.md
 ├── CITATION.cff
 ├── requirements.txt    # development only; run_amt.py needs the standard library
-├── .github/workflows/  # ci.yml: main.py --strict on push and pull request
+├── .github/workflows/  # ci.yml (main.py --strict on push and pull request),
+│                       # network.yml (smoke and drift, weekly and on request)
 ├── README.md
 ├── .gitignore
 ├── .amt-cache/         # created on first run, git-ignored
@@ -403,6 +412,24 @@ GitHub Actions runs `python main.py --strict` on every push to `main` and on
 every pull request (`.github/workflows/ci.yml`), on Linux and Windows with
 Python 3.10 and 3.13. It needs no network beyond installing `pytest`.
 
+Two more steps need the network and therefore run only when asked for:
+
+```bash
+python main.py --only smoke        # run_amt.py animals.ttl end to end; clones the engine
+python main.py --only drift        # bundled examples against the engine's examples/
+```
+
+`smoke` does what the README describes — it clones the engine into
+`.amt-cache/`, installs its requirements into the active Python and writes the
+outputs to `build/smoke/` — and fails if a file is missing or the number of
+inferred edges for `animals.ttl` is no longer 106. `drift` clones the engine
+shallowly into `build/drift/` and compares the bundled examples with the
+engine's, ignoring line endings; `subsumption-demo.md` differs on purpose.
+With `--strict`, both turn a warning into a failure. A weekly workflow
+(`.github/workflows/network.yml`, Sundays) runs both, and it can be started by
+hand from the "Actions" tab; GitHub pauses scheduled workflows after 60 days
+without repository activity.
+
 The combined output is written to `build/pipeline_report.txt`. Changes are
 recorded in [`CHANGELOG.md`](CHANGELOG.md); `PRIMER.md` holds the (German) work
 plan and the decisions behind the repository.
@@ -411,11 +438,12 @@ plan and the decisions behind the repository.
 
 - [AMT.engine](https://github.com/n4o-rse/amt-engine) — the reasoning engine itself
 - [Academic Meta Tool](http://academic-meta-tool.xyz/) — the underlying framework
-- [AMT webviewer (CAA2026-amt)](https://github.com/leiza-scit/CAA2026-amt) — JS
-  visualisation that consumes the same TTL format
-
-A GitHub Pages publication of `animals.html` and similar examples is planned
-once the corresponding setup is in place in the engine repository.
+- [AMT Explorer](https://n4o-rse.github.io/amt-engine/) — the engine's web viewer
+  (`docs/` in the engine repository); it lets you pick a dataset, switch
+  reasoning on and off and download Turtle or Cypher
+- [AMT webviewer (CAA2026-amt)](https://github.com/leiza-scit/CAA2026-amt) — a
+  related viewer for the Potter attribution example, published at
+  <https://leiza-scit.github.io/CAA2026-amt/>
 
 ## Citation
 

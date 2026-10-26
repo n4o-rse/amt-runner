@@ -73,7 +73,11 @@ Eigenschaften, die das Repo haben muss:
 | Uhr im Output | Laufzeit-Ausgaben behalten ihre Zeitstempel (`out/run-<Zeitstempel>`) | 2026-10-26 |
 | Versionierung | Konstante `__version__ = "0.2.0"` in `run_amt.py`, kein `--version`-Flag (ein Flag würde sonst nicht mehr an die Engine durchgereicht) | 2026-10-26 |
 | CHANGELOG | Keep a Changelog, rückwirkend rekonstruiert (0.1.0 und 0.2.0); Datum = Commit, der die Änderung geliefert hat; keine Tags | 2026-10-26 |
-| Dev-Schritte | nur `meta` und `tests`; Netz-Schritte `smoke` und `drift` sind nicht aufgenommen (D1, D2) | 2026-10-26 |
+| Dev-Schritte | `meta` und `tests` im Standardlauf; die Netz-Schritte `smoke` und `drift` sind eigene Verben (`--only`), nie im Standardlauf und nie über `--from` oder `--skip` (S2) | 2026-10-26 |
+| Netz-CI | `.github/workflows/network.yml`: wöchentlich (sonntags) und auf Abruf, Ubuntu, Python 3.13, `--strict`; nie bei Push | 2026-10-26 |
+| Drift-Vergleich | nach Dateiname, Zeilenenden normalisiert; `subsumption-demo.md` weicht gewollt ab; nur in der Engine vorhandene Beispiele werden genannt, zählen aber nicht | 2026-10-26 |
+| Namensgleichheit | Repo und Skript behalten ihre Namen; die README erklärt den Unterschied zum Engine-Befehl `amt-runner` | 2026-10-26 |
+| Standard-Ref der Engine | bleibt `main` (Entscheidung am 2026-10-26); die README zeigt `--ref v0.3.1` als Beispiel für reproduzierbare Läufe | 2026-10-26 |
 | `requirements.txt` | genau eine Datei pro Repo; hier nur Kommentar (Laufzeit = Standardbibliothek) plus `pytest` für die Entwicklung | 2026-10-26 |
 | Engine-Pin | Standard bleibt `main`; das README-Beispiel zeigt `41620dd`; Pin auf Tags erst nach S5 (engine) | 2026-10-26 |
 | Ort des Pipeline-Reports | `build/pipeline_report.txt`, ignoriert | 2026-10-26 |
@@ -117,12 +121,12 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 |---|---|---|---|---|
 | S0 | Festlegungen: Version, Dev-Schritte, requirements, Engine-Pin | amt-runner | – | erledigt 2026-10-26 |
 | S1 | Skeleton: `PRIMER.md`, `main.py`, `py/`, `tests/`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, README | amt-runner | S0 | erledigt 2026-10-26 |
-| S2 | Netz-Schritte `smoke` und `drift` (eigene Verben, nie im Standardlauf) | amt-runner | S1 | offen |
+| S2 | Netz-Schritte `smoke` und `drift` (eigene Verben, nie im Standardlauf) | amt-runner | S1 | erledigt 2026-10-26 |
 | S3 | `CITATION.cff` und `LICENSE`: Autorenliste und Rechteinhaber klären | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | erledigt 2026-10-26 |
 | S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | erledigt 2026-10-26 |
 
-S3, S4 und S5 sind erledigt; S2 ist offen.
+S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -199,13 +203,30 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Zenodo: Version `10.5281/zenodo.23669558`, Concept-DOI `10.5281/zenodo.23669557`; Autoren mit ORCID aus `CITATION.cff`.
 - 5c: DOI in `CITATION.cff`, Abschnitt „Citation“ im README, CHANGELOG unter `[Unreleased]`.
 
+## S2 – Netz-Schritte smoke und drift
+
+**Ziel:** Zwei Prüfungen, die das Netz brauchen, laufen auf Abruf und wöchentlich, ohne den Standardlauf abhängig vom Netz zu machen.
+
+**Uploads:** `PRIMER.md`; Antworten aus einem Formular im Engine-Chat (Netz-CI: wöchentlich und auf Abruf).
+
+**Inhalt:** `py/step_smoke.py`, `py/step_drift.py`, in `main.py` als eigene Verben; `tests/test_dev_steps.py` (9 Offline-Tests der Entscheidungen); `.github/workflows/network.yml`; README und CHANGELOG. `tests/conftest.py` nimmt `py/` in den Suchpfad auf, weil `py` sonst von pytests gleichnamigem Modul verdeckt würde.
+
+**Abnahme:** `python main.py --strict` grün (20 Tests), zweimal hintereinander; `python main.py --only drift --strict` und `--only smoke --strict` enden mit 0; ein verändertes `animals.ttl` lässt `drift` mit `--strict` scheitern; `--from tests` und der Standardlauf rufen die Netz-Schritte nicht auf; nach dem Push zeigt „Actions“ den Workflow „Network checks“ (Start von Hand).
+
+### Erledigt 2026-10-26
+
+- Beide Schritte liefen gegen GitHub: `drift` meldete sieben gleiche Dateien und die eine gewollte Abweichung (`subsumption-demo.md`), `chain-test.ttl` und `skos-mapping-example.ttl` nur in der Engine; `smoke` schrieb alle sechs Dateien, 106 abgeleitete Kanten. `--ref v0.3.1` ergab denselben Wert (Engine `359b29f`).
+- Gegenprobe: eine angehängte Zeile in `animals.ttl` ließ `drift --strict` mit Exit-Code 1 enden.
+- Der Workflow ist mit `actionlint` geprüft; ein Lauf auf GitHub steht aus. Ein zweiter Lauf von `main.py --only …` überschreibt `build/pipeline_report.txt`; das Artefakt enthält darum nur den Bericht des letzten Schritts (`smoke`).
+- Beschlüsse in A4.
+
 ---
 
 ## Teil D – Offene Punkte
 
-- **D1** Netz-Schritt `smoke` (Engine klonen, `animals.ttl` durchlaufen lassen): eigenes Verb, nie im Standardlauf. S4 (CI) läuft jetzt; ein Smoke-Job wäre ein eigener, bewusst gewählter Schritt (braucht Netz und ist langsamer).
-- **D2** Netz-Schritt `drift`: Vergleich der kopierten Beispiele mit `amt-engine/examples/` (Zeilenenden normalisiert). Ohne ihn fällt Auseinanderlaufen erst auf, wenn jemand es bemerkt. Sieben von acht Dateien sind heute identisch.
-- **D3** Namensgleichheit Repo `amt-runner` und Engine-Befehl `amt-runner`: umbenennen oder in der README klar trennen?
-- **D4** Die README verweist unter „Related“ auf `leiza-scit/CAA2026-amt` und sagt, eine GitHub-Pages-Veröffentlichung sei geplant. Beides prüfen, ob es noch stimmt.
+- **D1** erledigt in S2: `smoke` (Engine klonen, `animals.ttl` durchlaufen lassen).
+- **D2** erledigt in S2: `drift` (Vergleich der kopierten Beispiele mit `amt-engine/examples/`).
+- **D3** erledigt 2026-10-26: Namen bleiben, die README trennt die beiden Bedeutungen (A4).
+- **D4** erledigt 2026-10-26: `Related` in der README ist aktualisiert. Die GitHub-Pages-Seite der Engine (`https://n4o-rse.github.io/amt-engine/`, „AMT Explorer“) und `https://leiza-scit.github.io/CAA2026-amt/` (Potter Attribution) sind erreichbar; ob CAA2026-amt dasselbe Turtle-Format einliest, ließ sich aus der Seite nicht erkennen und steht deshalb nicht mehr in der README.
 - **D5** erledigt 2026-10-26 (Engine-S6): `pytest` darf mitkommen. Ausgangslage: Engine-Primer, Beschluss vom 2026-10-26 („eine `requirements.txt` pro Repo“); `amt-engine` hatte zusätzlich `requirements-dev.txt`. Fasst man beide zusammen, installiert dieser Runner beim Start auch `pytest`, weil er die Datei der Engine verwendet. Entscheidung dort (Schritt S6).
 - **D6** Der Engine-Aufruf aus `run_amt.py` liefert bei Konsistenzverletzungen Exit-Code 0 (siehe Engine-Primer, D6); der Wrapper reicht ihn unverändert durch.

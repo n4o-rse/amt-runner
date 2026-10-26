@@ -14,9 +14,13 @@ stays untouched by everything in here.
     python main.py --dry-run           print the plan, run nothing
     python main.py --strict            warnings become errors (what CI runs)
 
+    python main.py --only smoke        network step: run_amt.py end to end
+    python main.py --only drift        network step: bundled examples vs the engine's
+
 Every step is also runnable on its own, e.g. ``python py/step_tests.py``.
-The combined output is written to ``build/pipeline_report.txt``. Nothing in
-here touches the network.
+The combined output is written to ``build/pipeline_report.txt``. The default
+run touches no network: the two network steps ``smoke`` and ``drift`` are
+verbs of their own and never run unless asked for with ``--only``.
 """
 from __future__ import annotations
 
@@ -38,11 +42,19 @@ STEPS: list[tuple[str, str, str]] = [
 ]
 NAMES = [s[0] for s in STEPS]
 
+# Steps that need the network: only ever started by name, never by default,
+# --from or --skip.
+NETWORK_STEPS: list[tuple[str, str, str]] = [
+    ("smoke", "step_smoke.py", "network: run_amt.py animals.ttl end to end (clones the engine)"),
+    ("drift", "step_drift.py", "network: bundled examples against the engine's examples/"),
+]
+NETWORK_NAMES = [s[0] for s in NETWORK_STEPS]
+
 
 def select(args: argparse.Namespace) -> list[tuple[str, str, str]]:
-    chosen = list(STEPS)
     if args.only:
-        chosen = [s for s in chosen if s[0] == args.only]
+        return [s for s in STEPS + NETWORK_STEPS if s[0] == args.only]
+    chosen = list(STEPS)
     if args.from_step:
         start = NAMES.index(args.from_step)
         chosen = [s for s in chosen if NAMES.index(s[0]) >= start]
@@ -81,7 +93,8 @@ def main(argv: list[str] | None = None) -> int:
 
     p = argparse.ArgumentParser(description="Development pipeline of amt-runner")
     p.add_argument("--list", action="store_true", help="print steps and exit")
-    p.add_argument("--only", choices=NAMES, metavar="STEP", help="run one step")
+    p.add_argument("--only", choices=NAMES + NETWORK_NAMES, metavar="STEP",
+                   help="run one step (the network steps smoke and drift only run this way)")
     p.add_argument("--from", dest="from_step", choices=NAMES, metavar="STEP",
                    help="run this step and everything after it")
     p.add_argument("--skip", action="append", choices=NAMES, metavar="STEP",
@@ -91,8 +104,8 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
 
     if args.list:
-        width = max(len(n) for n in NAMES)
-        for name, script, what in STEPS:
+        width = max(len(n) for n in NAMES + NETWORK_NAMES)
+        for name, script, what in STEPS + NETWORK_STEPS:
             print(f"{name:<{width}}  py/{script:<16} {what}")
         return 0
 
