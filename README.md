@@ -438,7 +438,7 @@ plan and the decisions behind the repository.
 
 - [AMT.engine](https://github.com/n4o-rse/amt-engine) — the reasoning engine itself
 - [Academic Meta Tool](http://academic-meta-tool.xyz/) — the underlying framework
-- [AMT Explorer](https://n4o-rse.github.io/amt-engine/) — the engine's web viewer
+- [AMT Explorer](https://n4o-rse.github.io/amt-engine/explorer/) — the engine's web viewer
   (`docs/` in the engine repository); it lets you pick a dataset, switch
   reasoning on and off and download Turtle or Cypher
 - [AMT webviewer (CAA2026-amt)](https://github.com/leiza-scit/CAA2026-amt) — a

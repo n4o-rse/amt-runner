@@ -13,6 +13,11 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+### Changed
+
+- README: the link to the AMT Explorer points to its new address,
+  `https://n4o-rse.github.io/amt-engine/explorer/`.
+
 ### Added
 
 - Two development steps that need the network and run only on request:
