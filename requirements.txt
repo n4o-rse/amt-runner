@@ -1,0 +1,13 @@
+# amt-runner — requirements
+#
+# run_amt.py itself needs nothing beyond the Python standard library
+# (Python 3.10 or newer, and git on PATH). The packages the *engine* needs
+# (rdflib, pyshacl, pyvis) are installed at run time from the cloned engine's
+# own requirements.txt, so they are deliberately not listed here: a second
+# list would be a second source that can drift from the engine's.
+#
+# The only entry below is for the development pipeline (python main.py):
+#
+#   pip install -r requirements.txt
+
+pytest>=7.0        # offline tests in tests/

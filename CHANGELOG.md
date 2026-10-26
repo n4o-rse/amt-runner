@@ -1,0 +1,73 @@
+# Changelog
+
+All notable changes to amt-runner are documented in this file.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and the project uses [Semantic Versioning](https://semver.org/). The version
+describes `run_amt.py`, not the AMT.engine it runs.
+
+The repository carries no git tags. The entries for 0.1.0 and 0.2.0 were
+reconstructed from the commit history; each date is that of the commit that
+delivered the change.
+
+## [Unreleased]
+
+### Added
+
+- `__version__` in `run_amt.py` (no new command-line flag).
+- `PRIMER.md`: German work plan with the standing rules, the decisions taken so
+  far and the numbered steps for this repository.
+- `main.py` and `py/`: a development pipeline with the steps `meta` and `tests`
+  (`--list`, `--only`, `--from`, `--skip`, `--dry-run`, `--strict`). It needs no
+  network. `run_amt.py` stays a single self-contained file.
+- `tests/`: offline tests for ref resolution in the cached shallow clone (tip,
+  tag and commit outside the shallow history, `--update`, unknown ref), the
+  dependency fingerprint, feature detection, argument forwarding and the
+  `out/latest` pointer. A local git repository stands in for the engine.
+- `CITATION.cff`, `requirements.txt` (development only; the runner itself needs
+  just the standard library) and this changelog.
+
+### Changed
+
+- `README.md`: the layout lists every bundled example, the pinning example uses
+  the engine commit `41620dd`, and a "Development" section describes `main.py`.
+- `.gitignore`: also ignores `build/`, `.pytest_cache/` and `PATCH-README.md`.
+
+## [0.2.0] - 2026-08-29
+
+### Added
+
+- `--minimal`: asks the engine to drop inferred edges that a finer role already
+  implies (`amt:SubsumptionAxiom`, AMT.engine 0.3.0 or newer). If the cached
+  engine is older, the script says so and names `--update` instead of letting
+  the engine fail with an argument error.
+- Flags the wrapper does not know are forwarded to `amt.runner` unchanged, so a
+  new engine option works here before the wrapper has heard of it.
+- Dependencies are installed from the engine's own `requirements.txt`, with the
+  previous fixed list as a fallback for older refs. The marker file now stores a
+  fingerprint of the file, so a changed requirement list triggers a reinstall.
+- Every run prints the engine commit it used.
+- `subsumption-demo.ttl` and `subsumption-demo.md`.
+
+### Fixed
+
+- Ref pinning: the cache is checked out detached at `origin/<ref>`, so a local
+  branch left over from an earlier run can no longer point at a stale commit.
+  A tag or commit that is not in the shallow clone is fetched on demand, and an
+  unknown ref ends with a clear message instead of a bare git error.
+
+## [0.1.0] - 2026-05-05
+
+### Added
+
+- First version of `run_amt.py`: clones AMT.engine into `.amt-cache/`, installs
+  `rdflib`, `pyshacl` and `pyvis` once, and runs `amt.runner` into a fresh
+  `out/run-<timestamp>/` folder, with `out/latest` pointing at the newest run.
+- Options `--outdir`, `--ref` and `--update`.
+- Bundled examples with a companion `.md` each: `animals`,
+  `PotterAttributionExample`, `SKOSconceptExample`.
+- README with quickstart, output layout and an expected-output walkthrough.
+
+[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/bab9ea8...HEAD
+[0.2.0]: https://github.com/n4o-rse/amt-runner/commit/445904c
+[0.1.0]: https://github.com/n4o-rse/amt-runner/commit/fc8d18d

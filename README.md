@@ -263,7 +263,7 @@ the script notices and fetches the rest of the history on demand rather than
 failing:
 
 ```bash
-python run_amt.py animals.ttl --ref a50822cd758ca8b23dfdb373bcc987ba92e0e51d
+python run_amt.py animals.ttl --ref 41620dd1e9f57bfbb3f4db543853aec8ecd2a906
 ```
 
 Pin a SHA rather than `main` for anything whose results you intend to cite.
@@ -320,9 +320,18 @@ identical output in both modes.
 
 ```
 amt-runner/
-├── run_amt.py          # the wrapper script
-├── animals.ttl         # demo input
-├── subsumption-demo.ttl  # demo input for --minimal
+├── run_amt.py          # the wrapper script (self-contained, copy it freely)
+├── animals.ttl         # demo input, with animals.md
+├── subsumption-demo.ttl  # demo input for --minimal, with subsumption-demo.md
+├── PotterAttributionExample.ttl  # demo input, with a companion .md
+├── SKOSconceptExample.ttl        # demo input, with a companion .md
+├── main.py             # development pipeline (see "Development")
+├── py/                 # the steps behind main.py
+├── tests/              # offline tests for run_amt.py
+├── PRIMER.md           # work plan and decisions (German)
+├── CHANGELOG.md
+├── CITATION.cff
+├── requirements.txt    # development only; run_amt.py needs the standard library
 ├── README.md
 ├── .gitignore
 ├── .amt-cache/         # created on first run, git-ignored
@@ -372,6 +381,26 @@ install would require. It just installs the engine's runtime dependencies into
 your active Python and runs `python -m amt.runner` from inside the cloned
 repo — exactly what you'd do if you cloned and ran the engine by hand. If
 you want isolation, put the script in a venv yourself.
+
+## Development
+
+`run_amt.py` is the product; `main.py` only maintains the repository. It checks
+that the version in `run_amt.py`, `CHANGELOG.md` and `CITATION.cff` agree, and
+runs the test suite. The tests need `git` but no network: a small local
+repository stands in for the engine.
+
+```bash
+pip install -r requirements.txt    # pytest
+python main.py                     # all steps
+python main.py --list              # show the steps
+python main.py --only tests        # one step
+python main.py --dry-run           # print the plan, run nothing
+python main.py --strict            # warnings become errors (use this in CI)
+```
+
+The combined output is written to `build/pipeline_report.txt`. Changes are
+recorded in [`CHANGELOG.md`](CHANGELOG.md); `PRIMER.md` holds the (German) work
+plan and the decisions behind the repository.
 
 ## Related
 

@@ -2,6 +2,13 @@
 .amt-cache/
 out/
 
+# Development pipeline (main.py)
+build/
+.pytest_cache/
+
+# Delivery note that travels with a patch ZIP, never part of the repository
+PATCH-README.md
+
 # Python
 __pycache__/
 *.pyc

@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "amt-runner: run the AMT.engine pipeline on a Turtle file"
+abstract: >-
+  amt-runner is a small wrapper script around AMT.engine. It clones the engine
+  into a local cache, installs its dependencies once and runs the full
+  pipeline (SHACL validation, fuzzy-logic reasoning, consistency check, export
+  to Turtle, Cypher, CSV and an interactive HTML graph, plus a run report) on a
+  single Turtle file, writing every run into its own folder.
+type: software
+authors:
+  - family-names: Thiery
+    given-names: Florian
+    affiliation: "Leibniz-Zentrum für Archäologie (LEIZA)"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: insert ORCID
+license: MIT
+version: "0.2.0"
+date-released: "2026-08-29"
+repository-code: "https://github.com/n4o-rse/amt-runner"
+# doi: "10.5281/zenodo.XXXXXXX"  # TODO: add Zenodo DOI once minted
+keywords:
+  - Academic Meta Tool
+  - fuzzy logic
+  - Linked Data
+  - RDF
+  - knowledge graph
+  - NFDI4Objects
