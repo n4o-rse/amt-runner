@@ -33,6 +33,9 @@ release published on GitHub and archived on Zenodo.
   Pages publication is no longer announced as future (it is live), and
   CAA2026-amt is described as a related viewer instead of one that consumes the
   same Turtle format.
+- `actions/upload-artifact` goes from v5 to v6 in the workflow files. v5 still
+  runs on Node 20 and made every run print the Node 20 deprecation warning;
+  v6 runs on Node 24. The entry for 0.2.1 below names v5 wrongly.
 
 ## [0.2.1] - 2026-10-26
 

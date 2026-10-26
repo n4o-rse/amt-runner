@@ -37,7 +37,7 @@ jobs:
 
       - name: Keep the pipeline report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: network-report
           path: build/pipeline_report.txt
