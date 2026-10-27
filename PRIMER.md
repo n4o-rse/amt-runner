@@ -85,6 +85,8 @@ Eigenschaften, die das Repo haben muss:
 | Hinweis nach dem Lauf | `run_amt.py` nennt am Ende die Adresse des Explorers (`https://n4o-rse.github.io/amt-engine/explorer/`) und die Datei `<name>.reasoned.ttl`, die sich dort mit dem Ordner-Knopf laden lässt | 2026-10-27 |
 | Version | 0.3.0 zusammen mit der Engine 0.4.0 (Beschluss 2026-10-27); die Nummern ändert S13, nicht S6 | 2026-10-27 |
 | Versionen der GitHub Actions | `checkout@v5`, `setup-python@v6`, `upload-artifact@v6` (alle Node 24, geprüft an `action.yml`), wie in `amt-engine` | 2026-10-26 |
+| `--check-only` im Wrapper | gehört dem Wrapper (eigene Option, Hilfetext), wird an die Engine weitergereicht; schreibt nichts: kein Laufordner, kein `latest`; fehlt die Option in der gecachten Engine, endet der Wrapper mit Exit-Code 2 und dem Rat `--update` (gleiches Muster wie `--minimal`) | 2026-10-27 |
+| Meldung bei gescheitertem Lauf | der Wrapper erklärt die Exit-Codes 1 bis 3 der Engine in einem Satz und nennt die How-To-Seite; andere Codes (meist ein Traceback einer zu alten Engine) bekommen den Rat `--update`; der Exit-Code wird unverändert durchgereicht | 2026-10-27 |
 | CI-Matrix | Ubuntu und Windows, Python 3.10 und 3.13; Auslöser Push auf `main`, Pull Request und manuell; nur `python main.py --strict` (meta, tests; ohne Netz), kein Smoke-Lauf | 2026-10-26 |
 | Autoren in `CITATION.cff` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, wie in `amt-engine` | 2026-10-26 |
@@ -129,6 +131,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | erledigt 2026-10-26 |
 | S6 | Nur Laufzeit-Abhängigkeiten installieren (aus `pyproject.toml` der Engine), Hinweis auf den Explorer, README | amt-runner | S5 | Patch geliefert, nach Push erledigt |
 | S7 | Release 0.3.0 (Version, CHANGELOG, `smoke` mit `--update`), Tag, GitHub-Release, Zenodo | amt-runner | S6 | Patch, Tag `v0.3.0`, Release und Zenodo erledigt; DOI-Patch (Versions-DOI `10.5281/zenodo.23688616`) geliefert |
+| S8 | `--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update` (Gegenstück zu S16 in `amt-engine`) | amt-runner | S7 | Patch geliefert |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
@@ -243,6 +246,22 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 **Danach (manuell):** annotierter Tag `v0.3.0` auf dem Commit dieses Patches, Release auf GitHub, Zenodo, dann ein Patch mit der Versions-DOI in README und CHANGELOG.
 
 **Abnahme:** `python main.py --strict` zweimal grün; `python main.py --only smoke --strict` zeigt im Lauf den aktuellen Commit der Engine; `git tag` zeigt `v0.3.0`.
+
+---
+
+## S8 – Prüfen ohne Ausgabe, verständliche Fehler
+
+**Ziel:** Der Wrapper unterstützt das Prüfen einer Datei beim Bauen, ohne Ausgabeordner, und erklärt, was ein Abbruch bedeutet.
+
+**Anlass:** Rückmeldung von Karsten (AFE → AMT), siehe S16 im Primer von `amt-engine`: sein Lauf endete mit einem Traceback aus `.amt-cache/amt-engine/amt/viz.py`, weil der Cache eine ältere Engine enthielt als `main`.
+
+**Inhalt:** `run_amt.py`: Option `--check-only` (Hilfetext), `run_pipeline(..., check_only=True)` ohne Laufordner und ohne `latest`, Prüfung mit `engine_supports()`; `EXIT_MESSAGES` und `HOWTO_URL`; Tests in `tests/test_run_amt.py`; CHANGELOG und README.
+
+**Abnahme:** `python main.py --strict` zweimal grün; `python run_amt.py animals.ttl --check-only --update` druckt die Diagnose und legt keinen Ordner unter `out/` an; mit der alten Engine (`--ref v0.4.0`) endet derselbe Befehl mit Exit-Code 2 und dem Rat `--update`.
+
+### Erledigt 2026-10-27
+
+- Sandbox: 33 Tests grün (vorher 27). Noch offen: der Netz-Lauf `python main.py --only smoke --strict` und ein Lauf unter Windows; `--check-only` gegen die echte Engine geht erst, wenn der Engine-Patch (S16) auf `main` liegt.
 
 ---
 

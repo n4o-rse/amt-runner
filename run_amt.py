@@ -12,6 +12,7 @@ Usage
 -----
     python run_amt.py path/to/input.ttl
     python run_amt.py path/to/input.ttl --outdir results/
+    python run_amt.py path/to/input.ttl --check-only # validate + diagnose, write nothing
     python run_amt.py path/to/input.ttl --minimal    # drop subsumed edges
     python run_amt.py path/to/input.ttl --update     # pull latest amt.engine
     python run_amt.py path/to/input.ttl --ref v0.4.0 # pin to a tag/branch/sha
@@ -56,6 +57,17 @@ AMT_FALLBACK_DEPS = ["rdflib>=7.0", "pyshacl>=0.25", "pyvis>=0.3"]
 
 # Where the result of a run can be looked at.
 EXPLORER_URL = "https://n4o-rse.github.io/amt-engine/explorer/"
+
+# Where a failed run is explained.
+HOWTO_URL = "https://n4o-rse.github.io/amt-engine/howto/validate/"
+
+# What the exit codes of amt.runner mean, in words for people who do not read tracebacks.
+EXIT_MESSAGES = {
+    1: "The file did not pass the checks (SHACL validation, or --strict diagnostics). "
+       "The messages above name the IRI and say what to add.",
+    2: "The input file could not be found or read.",
+    3: "The engine hit an unexpected error. Re-run with --debug for the traceback.",
+}
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 CACHE_DIR = SCRIPT_DIR / ".amt-cache"
@@ -260,7 +272,7 @@ def engine_supports(flag: str) -> bool:
         return True  # can't tell — let the engine reject it with its own error
 
 
-def run_pipeline(input_file: Path, outdir: Path, engine_args: list[str]) -> None:
+def run_pipeline(input_file: Path, outdir: Path, engine_args: list[str], *, check_only: bool = False) -> None:
     """Invoke amt.runner — the full-pipeline entry point of AMT.engine.
 
     Each run gets its own timestamped subfolder: out/run-YYYYMMDD-HHMMSS/.
@@ -273,8 +285,14 @@ def run_pipeline(input_file: Path, outdir: Path, engine_args: list[str]) -> None
     """
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     run_dir = outdir / f"run-{timestamp}"
-    run_dir.mkdir(parents=True, exist_ok=True)
 
+    if check_only:
+        # Nothing is written, so no run folder and no `latest` pointer.
+        print(f"[3/3] Checking {input_file.name} (nothing will be written) ...")
+        run([sys.executable, "-m", "amt.runner", input_file, "--check-only", *engine_args], cwd=REPO_DIR)
+        return
+
+    run_dir.mkdir(parents=True, exist_ok=True)
     print(f"[3/3] Running pipeline on {input_file.name} ...")
     # Run from inside the repo so amt's relative imports + ontology paths work,
     # exactly as if you'd cloned it and run the runner by hand.
@@ -346,6 +364,11 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
              "that a finer role already implies (needs AMT.engine >= 0.3.0)",
     )
     p.add_argument(
+        "--check-only", action="store_true",
+        help="Validate, load and diagnose the file, then stop. Writes no output "
+             "(needs an AMT.engine newer than 0.4.0; use --update to fetch it)",
+    )
+    p.add_argument(
         "--ref", default=AMT_DEFAULT_REF,
         help=f"Git ref of amt.engine to use (default: {AMT_DEFAULT_REF})",
     )
@@ -381,10 +404,27 @@ def main() -> int:
                 return 2
             engine_args.append("--minimal")
 
+        needed = (["--check-only"] if args.check_only else []) + (["--strict"] if "--strict" in engine_args else [])
+        for flag in needed:
+            if not engine_supports(flag):
+                print(
+                    f"FAIL  The cached AMT.engine does not know {flag}.\n"
+                    "      It is newer than the copy in\n"
+                    f"      {REPO_DIR}\n"
+                    "      Re-run the same command with --update to fetch a current engine.",
+                    file=sys.stderr,
+                )
+                return 2
         ensure_deps()
-        run_pipeline(args.input.resolve(), args.outdir, engine_args)
+        run_pipeline(args.input.resolve(), args.outdir, engine_args, check_only=args.check_only)
     except subprocess.CalledProcessError as e:
         print(f"\nFAIL  step failed (exit {e.returncode})", file=sys.stderr)
+        if e.returncode in EXIT_MESSAGES:
+            print(f"      {EXIT_MESSAGES[e.returncode]}", file=sys.stderr)
+        else:
+            print("      A Python traceback above usually means the cached engine is out of date: "
+                  "re-run with --update.", file=sys.stderr)
+        print(f"      Help: {HOWTO_URL}", file=sys.stderr)
         return e.returncode
     return 0
 

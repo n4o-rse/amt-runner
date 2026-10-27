@@ -290,3 +290,51 @@ def test_no_hint_when_there_is_no_reasoned_file(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(run_amt, "run", lambda cmd, **kw: None)
     run_amt.run_pipeline(inp, tmp_path / "out", [])
     assert run_amt.EXPLORER_URL not in capsys.readouterr().out
+
+
+# --------------------------------------------------------------------------- #
+# Checking without writing; explaining failures
+# --------------------------------------------------------------------------- #
+def test_check_only_is_a_wrapper_flag(monkeypatch):
+    monkeypatch.setattr(sys, "argv", ["run_amt.py", "in.ttl", "--check-only", "--strict"])
+    args, passthrough = run_amt.parse_args()
+    assert args.check_only is True
+    assert passthrough == ["--strict"]
+
+
+def test_check_only_makes_no_run_folder(monkeypatch, tmp_path):
+    inp = tmp_path / "x.ttl"
+    inp.write_text("# x\n", encoding="utf-8")
+    calls = []
+    monkeypatch.setattr(run_amt, "run", lambda cmd, **kw: calls.append([str(c) for c in cmd]))
+    run_amt.run_pipeline(inp, tmp_path / "out", [], check_only=True)
+    assert not (tmp_path / "out").exists()
+    assert "--check-only" in calls[0] and "-o" not in calls[0]
+
+
+def test_old_cached_engine_is_told_to_update(monkeypatch, tmp_path, capsys):
+    inp = tmp_path / "x.ttl"
+    inp.write_text("# x\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["run_amt.py", str(inp), "--check-only"])
+    monkeypatch.setattr(run_amt, "ensure_repo", lambda ref, update: None)
+    monkeypatch.setattr(run_amt, "engine_supports", lambda flag: False)
+    assert run_amt.main() == 2
+    err = capsys.readouterr().err
+    assert "--check-only" in err and "--update" in err
+
+
+@pytest.mark.parametrize("code, words", [(1, "did not pass"), (3, "unexpected error"), (7, "--update")])
+def test_failed_run_is_explained(monkeypatch, tmp_path, capsys, code, words):
+    inp = tmp_path / "x.ttl"
+    inp.write_text("# x\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["run_amt.py", str(inp)])
+    monkeypatch.setattr(run_amt, "ensure_repo", lambda ref, update: None)
+    monkeypatch.setattr(run_amt, "ensure_deps", lambda: None)
+
+    def failing(*a, **k):
+        raise subprocess.CalledProcessError(code, "x")
+
+    monkeypatch.setattr(run_amt, "run_pipeline", failing)
+    assert run_amt.main() == code
+    err = capsys.readouterr().err
+    assert words in err and run_amt.HOWTO_URL in err

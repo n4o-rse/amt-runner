@@ -13,6 +13,16 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+### Added
+
+- `--check-only`: validate, load and diagnose the file and stop. Nothing is written, so there
+  is no run folder and `out/latest` is left alone. Needs an engine newer than 0.4.0; with an
+  older cached copy the wrapper says so and tells you to re-run with `--update`.
+- A failed run is explained: the wrapper names what exit code 1, 2 and 3 of the engine mean
+  and links the How-To page on checking a file
+  (<https://n4o-rse.github.io/amt-engine/howto/validate/>). Any other code, which is usually a
+  traceback from an outdated cached engine, is met with the advice to use `--update`.
+
 ### Changed
 
 - `README.md`, "Citation": names the version DOI of 0.3.0,

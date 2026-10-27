@@ -247,6 +247,20 @@ python run_amt.py my-data.ttl --no-check --height 900px
 The one exception is `-o` / `--outdir`: that belongs to the wrapper, which
 manages the per-run subfolder itself.
 
+### Check a file before you run it
+
+While you are building a file, check it without producing any output:
+
+```bash
+python run_amt.py my-data.ttl --check-only
+```
+
+It validates the file, loads it and reports problems in plain words, naming the IRI and what
+to add (for example an edge that points at something that is not declared as a node). If the
+wrapper says it does not know `--check-only`, the engine in `.amt-cache/` is older than the
+flag: add `--update`. How to build a file and what each message means:
+[How-To](https://n4o-rse.github.io/amt-engine/howto/).
+
 Your file needs to follow the AMT vocabulary — Concepts, Roles, weighted edges,
 and (optionally) RoleChainAxioms, InverseAxioms or SubsumptionAxioms. The bundled
 [`animals.ttl`](animals.ttl) is the most complete worked example; for the formal
@@ -260,6 +274,7 @@ specification see the [AMT.engine README](https://github.com/n4o-rse/amt-engine)
 | `--minimal` | off | Suppress inferred edges implied by a finer role (needs engine ≥ 0.3.0) |
 | `--ref REF` | `main` | Pin AMT.engine to a tag, branch, or commit SHA |
 | `--update` | off | Fetch the current engine before running |
+| `--check-only` | off | Validate, load and diagnose; write nothing (needs an engine newer than 0.4.0) |
 
 Everything else is forwarded to `amt.runner` — `--no-check`, `--no-report`,
 `--no-info`, `--height`, and whatever the engine gains next.
