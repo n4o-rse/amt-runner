@@ -13,6 +13,11 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+### Changed
+
+- `README.md`, "Citation": names the version DOI of 0.4.0,
+  `10.5281/zenodo.23695549`. The concept DOI is unchanged.
+
 ## [0.4.0] - 2026-10-27
 
 0.4.0 adds a way to check a file without running it and explains a failed run;

@@ -132,7 +132,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S6 | Nur Laufzeit-Abhängigkeiten installieren (aus `pyproject.toml` der Engine), Hinweis auf den Explorer, README | amt-runner | S5 | Patch geliefert, nach Push erledigt |
 | S7 | Release 0.3.0 (Version, CHANGELOG, `smoke` mit `--update`), Tag, GitHub-Release, Zenodo | amt-runner | S6 | Patch, Tag `v0.3.0`, Release und Zenodo erledigt; DOI-Patch (Versions-DOI `10.5281/zenodo.23688616`) geliefert |
 | S8 | `--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update` (Gegenstück zu S16 in `amt-engine`) | amt-runner | S7 | erledigt 2026-10-27 |
-| S9 | Release 0.4.0 (Version, CHANGELOG, Pinning-Beispiel `v0.5.0`), Tag, GitHub-Release, Zenodo (Gegenstück zu S18 in `amt-engine`) | amt-runner | S8 | 9a als Patch geliefert |
+| S9 | Release 0.4.0 (Version, CHANGELOG, Pinning-Beispiel `v0.5.0`), Tag, GitHub-Release, Zenodo (Gegenstück zu S18 in `amt-engine`) | amt-runner | S8 | 9a und 9b erledigt (Tag `v0.4.0`, Release, Zenodo); 9c als Patch geliefert |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
@@ -271,6 +271,8 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 **Ziel:** Der Runner 0.4.0 mit `--check-only` ist veröffentlicht und archiviert, zusammen mit der Engine 0.5.0 (siehe S18 im Primer von `amt-engine`).
 
 **Inhalt (9a, Patch):** Version 0.4.0 in `run_amt.py`, `CITATION.cff`, `py/amt_runner_dev_utils.py` und `CHANGELOG.md`; die README nennt `--ref v0.5.0` als Beispiel und verlangt für `--check-only` die Engine 0.5.0 oder neuer (die Engine 0.4.0 kennt die Option nicht); Verweis auf die How-To-Seite „Run and look at the result“.
+
+**Versions-DOI Runner 0.4.0:** `10.5281/zenodo.23695549`.
 
 **Danach (manuell, 9b):** annotierter Tag `v0.4.0` auf dem Commit von 9a, Release auf GitHub, Zenodo. **9c (Patch):** die Versions-DOI in README und CHANGELOG.
 
