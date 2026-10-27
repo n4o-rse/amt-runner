@@ -13,27 +13,18 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+### Changed
+
+- `README.md`, "Citation": names the version DOI of 0.3.0,
+  `10.5281/zenodo.23688616`. The concept DOI is unchanged.
+- This changelog: the entry for 0.3.0 has one list each for Added and Changed (it
+  repeated its headings), and the entry for 0.2.1 states correctly which GitHub
+  Actions run on Node 24.
+
 ## [0.3.0] - 2026-10-27
 
 0.3.0 changes what `run_amt.py` installs and prints; the arguments and the
 output files are the same.
-
-### Changed
-
-- The step `smoke` runs the wrapper with `--update`, so it checks the current
-  engine and not whatever is in `.amt-cache/`.
-- `run_amt.py` installs only the run-time dependencies of the engine (rdflib,
-  pyshacl, pyvis), read from `[project].dependencies` in the engine's
-  `pyproject.toml`, and no longer the whole `requirements.txt`, which also lists
-  the engine's development packages (pytest, Pillow, PyYAML). The built-in list
-  remains the fallback. The first run after the update says once that the
-  dependencies changed and runs `pip`, which finds everything in place.
-- After a run, `run_amt.py` points to the AMT Explorer and to the reasoned Turtle
-  file that can be loaded there.
-- README "Related": the start page of AMT replaces the old domain; `https://w3id.org/amt/`
-  is named as its permanent address.
-- README: the link to the AMT Explorer points to its new address,
-  `https://n4o-rse.github.io/amt-engine/explorer/`.
 
 ### Added
 
@@ -44,20 +35,33 @@ output files are the same.
 - `.github/workflows/network.yml`: runs both weekly (Sundays) and on request.
 - Offline tests for the decisions behind the two steps.
 - README: a note that the repository and the engine's command are both called
-  amt-runner, and a pinning example with the tag `v0.3.1`.
+  amt-runner, and a pinning example with the tag `v0.4.0`.
 - The Zenodo DOI `10.5281/zenodo.23669557` (all versions) in `CITATION.cff`,
   and a "Citation" section with the DOI badge in `README.md`. Release 0.2.1
   itself is archived as `10.5281/zenodo.23669558`.
 
 ### Changed
 
-- README "Related": the AMT Explorer of the engine is linked, the planned GitHub
-  Pages publication is no longer announced as future (it is live), and
-  CAA2026-amt is described as a related viewer instead of one that consumes the
-  same Turtle format.
+- `run_amt.py` installs only the run-time dependencies of the engine (rdflib,
+  pyshacl, pyvis), read from `[project].dependencies` in the engine's
+  `pyproject.toml`, and no longer the whole `requirements.txt`, which also lists
+  the engine's development packages (pytest, Pillow, PyYAML). The built-in list
+  remains the fallback. The first run after the update says once that the
+  dependencies changed and runs `pip`, which finds everything in place.
+- After a run, `run_amt.py` points to the AMT Explorer and to the reasoned Turtle
+  file that can be loaded there.
+- The step `smoke` runs the wrapper with `--update`, so it checks the current
+  engine and not whatever is in `.amt-cache/`.
+- README "Related": the start page of AMT replaces the old domain and
+  `https://w3id.org/amt/` is named as its permanent address; the AMT Explorer of
+  the engine is linked at its new address,
+  `https://n4o-rse.github.io/amt-engine/explorer/`; the planned GitHub Pages
+  publication is no longer announced as future (it is live); CAA2026-amt is
+  described as a related viewer instead of one that consumes the same Turtle
+  format.
 - `actions/upload-artifact` goes from v5 to v6 in the workflow files. v5 still
   runs on Node 20 and made every run print the Node 20 deprecation warning;
-  v6 runs on Node 24. The entry for 0.2.1 below names v5 wrongly.
+  v6 runs on Node 24.
 
 ## [0.2.1] - 2026-10-26
 
@@ -85,8 +89,9 @@ and continuous integration.
 
 ### Changed
 
-- The CI workflow uses `actions/checkout@v5`, `actions/setup-python@v6` and
-  `actions/upload-artifact@v5`, which run on Node 24.
+- The CI workflow uses `actions/checkout@v5` and `actions/setup-python@v6`,
+  which run on Node 24, and `actions/upload-artifact@v5`, which still runs on
+  Node 20 (moved to v6 in 0.3.0).
 - `LICENSE`: the copyright holder reads "Florian Thiery | LEIZA | Research
   Squirrel Engineers Network" (was "NFDI4Objects | Research Software
   Engineering Projects"), the same as in AMT.engine.
