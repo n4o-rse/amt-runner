@@ -13,8 +13,15 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-27
+
+0.3.0 changes what `run_amt.py` installs and prints; the arguments and the
+output files are the same.
+
 ### Changed
 
+- The step `smoke` runs the wrapper with `--update`, so it checks the current
+  engine and not whatever is in `.amt-cache/`.
 - `run_amt.py` installs only the run-time dependencies of the engine (rdflib,
   pyshacl, pyvis), read from `[project].dependencies` in the engine's
   `pyproject.toml`, and no longer the whole `requirements.txt`, which also lists
@@ -25,7 +32,6 @@ release published on GitHub and archived on Zenodo.
   file that can be loaded there.
 - README "Related": the start page of AMT replaces the old domain; `https://w3id.org/amt/`
   is named as its permanent address.
-
 - README: the link to the AMT Explorer points to its new address,
   `https://n4o-rse.github.io/amt-engine/explorer/`.
 
@@ -123,7 +129,8 @@ and continuous integration.
   `PotterAttributionExample`, `SKOSconceptExample`.
 - README with quickstart, output layout and an expected-output walkthrough.
 
-[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/n4o-rse/amt-runner/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/n4o-rse/amt-runner/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/n4o-rse/amt-runner/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/n4o-rse/amt-runner/commit/fc8d18d

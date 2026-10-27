@@ -265,14 +265,14 @@ Everything else is forwarded to `amt.runner` — `--no-check`, `--no-report`,
 `--no-info`, `--height`, and whatever the engine gains next.
 
 Pinning is the right move for reproducible pipelines. Branches, commit SHAs
-and tags all work; the engine publishes a tag for every release (`v0.3.1` is
-the first one that is archived on Zenodo). The cache is
+and tags all work; the engine publishes a tag for every release (`v0.3.1` was
+the first one that is archived on Zenodo, `v0.4.0` is the current one). The cache is
 cloned shallow, so a ref other than the tip of `main` is not in it at first;
 the script notices and fetches the rest of the history on demand rather than
 failing:
 
 ```bash
-python run_amt.py animals.ttl --ref v0.3.1
+python run_amt.py animals.ttl --ref v0.4.0
 python run_amt.py animals.ttl --ref 41620dd1e9f57bfbb3f4db543853aec8ecd2a906
 ```
 

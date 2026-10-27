@@ -1,9 +1,10 @@
 """
 Step ``smoke`` (network) — the real thing, end to end.
 
-Runs ``python run_amt.py animals.ttl`` exactly as the README describes: it
-clones AMT.engine from GitHub into ``.amt-cache/``, installs the engine's
-requirements into the active Python and writes the outputs to
+Runs ``python run_amt.py animals.ttl --update`` as the README describes: it
+clones AMT.engine from GitHub into ``.amt-cache/`` (or updates the clone, so the
+step checks the current engine and not a stale cache), installs the engine's
+run-time dependencies into the active Python and writes the outputs to
 ``build/smoke/``. The step fails when the run fails or an output file is
 missing. A different number of inferred edges than the README states (106) is
 a warning, so ``--strict`` makes it fail.
@@ -49,10 +50,15 @@ def newest_run(outdir: Path) -> Path | None:
     return runs[-1] if runs else None
 
 
+def command() -> list[str]:
+    """The call the step makes; ``--update`` so that a cached, older engine is never what gets tested."""
+    return [sys.executable, "run_amt.py", "animals.ttl", "--update", "--outdir", str(OUTDIR)]
+
+
 def main() -> int:
     rep = Report("smoke")
     proc = subprocess.run(
-        [sys.executable, "run_amt.py", "animals.ttl", "--outdir", str(OUTDIR)],
+        command(),
         cwd=ROOT, env=child_env(), text=True, encoding="utf-8", errors="replace",
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
     )

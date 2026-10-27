@@ -6,7 +6,7 @@ workflow; the decisions they make are plain functions and are covered here.
 from pathlib import Path
 
 from step_drift import INTENDED, compare
-from step_smoke import EXPECTED_FILES, inferred_edges, missing_files, newest_run
+from step_smoke import EXPECTED_FILES, command, inferred_edges, missing_files, newest_run
 
 
 def write(directory: Path, name: str, text: str, newline: str = "\n") -> None:
@@ -86,3 +86,8 @@ def test_newest_run_is_the_last_by_name(tmp_path: Path):
     (tmp_path / "latest").mkdir()
     assert newest_run(tmp_path).name == "run-20260301-000000"
     assert newest_run(tmp_path / "nowhere") is None
+
+
+def test_smoke_always_updates_the_cached_engine():
+    # a stale .amt-cache once let the smoke test pass against an engine from before the change under test
+    assert "--update" in command() and "animals.ttl" in command()

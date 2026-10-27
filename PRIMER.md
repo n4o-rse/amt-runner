@@ -128,6 +128,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | erledigt 2026-10-26 |
 | S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | erledigt 2026-10-26 |
 | S6 | Nur Laufzeit-Abhängigkeiten installieren (aus `pyproject.toml` der Engine), Hinweis auf den Explorer, README | amt-runner | S5 | Patch geliefert, nach Push erledigt |
+| S7 | Release 0.3.0 (Version, CHANGELOG, `smoke` mit `--update`), Tag, GitHub-Release, Zenodo | amt-runner | S6 | Patch geliefert; danach Tag, Release, Zenodo, DOI-Patch durch den Autor |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
@@ -230,6 +231,18 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 **Inhalt:** In `run_amt.py` liest `_engine_dependencies()` die Laufzeit-Pakete aus `[project].dependencies` der `pyproject.toml` des Engine-Klons (`tomllib`, unter Python 3.10 ein kleiner Textleser); fehlt die Datei oder ist sie unlesbar, gilt `AMT_FALLBACK_DEPS`. Der Fingerabdruck ist der Hash dieser Liste, nicht mehr der von `requirements.txt`: Änderungen an den Entwicklungspaketen der Engine lösen keine Neuinstallation mehr aus; beim ersten Lauf nach dem Update meldet der Runner einmal „Engine dependencies changed“. Nach dem Lauf steht die Adresse des Explorers in der Ausgabe. Tests: Parser, Fallback, Fingerabdruck, Aufruf von `pip`, Hinweis (7 neue Tests). README, CHANGELOG `[Unreleased]`.
 
 **Abnahme:** `python main.py --strict` grün, zweimal; `python main.py --only smoke --strict` (Netz) installiert nur `rdflib`, `pyshacl`, `pyvis` und endet mit der Explorer-Zeile.
+
+---
+
+## S7 – Release 0.3.0
+
+**Ziel:** Der Runner 0.3.0 ist veröffentlicht und archiviert, zusammen mit der Engine 0.4.0 (siehe S13 im Primer von `amt-engine`).
+
+**Inhalt:** Version 0.3.0 in `run_amt.py`, `CITATION.cff`, `py/amt_runner_dev_utils.py` (`RELEASE_DATE` 2026-10-27) und `CHANGELOG.md`; die README nennt `--ref v0.4.0` als Beispiel. Der Schritt `smoke` ruft den Wrapper mit `--update` auf: beim ersten Windows-Lauf nach S6 lief er gegen die zwischengespeicherte alte Engine (`a50822c`) und bestätigte deshalb nichts über den neuen Stand; ein Test hält das fest.
+
+**Danach (manuell):** annotierter Tag `v0.3.0` auf dem Commit dieses Patches, Release auf GitHub, Zenodo, dann ein Patch mit der Versions-DOI in README und CHANGELOG.
+
+**Abnahme:** `python main.py --strict` zweimal grün; `python main.py --only smoke --strict` zeigt im Lauf den aktuellen Commit der Engine; `git tag` zeigt `v0.3.0`.
 
 ---
 
