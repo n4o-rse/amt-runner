@@ -22,7 +22,7 @@ Die Schrittnummern gelten für dieses Repo. Im Primer von `amt-engine` heißt de
 **Befunde** (alle am 2026-10-26 geprüft, Stand `bab9ea8`; Engine beim Prüfen bei `41620dd`, inzwischen `b42b27b`):
 
 - Das Repo hatte 11 Commits und keine Tags. Es gab keine Versionsangabe im Code; die Versionen 0.1.0 (2026-05-05) und 0.2.0 (2026-08-29) sind aus der Historie rekonstruiert. Seit S5 tragen die Commits `fc8d18d` und `445904c` die Tags `v0.1.0` und `v0.2.0`.
-- `run_amt.py` braucht nur die Standardbibliothek. Die Pakete der Engine (`rdflib`, `pyshacl`, `pyvis`) kommen zur Laufzeit aus `requirements.txt` des Engine-Klons; die feste Liste im Skript ist nur der Rückfall für ältere Refs.
+- `run_amt.py` braucht nur die Standardbibliothek. Die Pakete der Engine (`rdflib`, `pyshacl`, `pyvis`) kommen zur Laufzeit aus `[project].dependencies` der `pyproject.toml` des Engine-Klons (seit S6; vorher aus dessen `requirements.txt`); die feste Liste im Skript ist nur der Rückfall.
 - Sieben von acht kopierten Beispieldateien sind byte-identisch mit `amt-engine/examples/`. `subsumption-demo.md` weicht gewollt ab (Befehle `python run_amt.py …` statt `python -m amt.runner …`, ein Absatz zu `out/run-…`).
 - Ein End-to-End-Lauf (`python run_amt.py animals.ttl`, Linux, Python 3.13, Engine von GitHub) erzeugt wie in der README beschrieben 106 abgeleitete Kanten und sechs Ausgabedateien.
 - Das Layout in der README nannte nur `animals.ttl` und `subsumption-demo.ttl`, obwohl auch die Potter- und SKOS-Beispiele im Repo liegen. Das Pin-Beispiel nannte noch `a50822c`. Beides korrigiert in S1.
@@ -36,7 +36,7 @@ Die Schrittnummern gelten für dieses Repo. Im Primer von `amt-engine` heißt de
 python run_amt.py input.ttl [--ref R] [--update] [--minimal] [engine flags]
    │
    ├─► .amt-cache/amt-engine   (git clone --depth 1, dann detached auf origin/<ref>)
-   ├─► pip install -r <engine>/requirements.txt   (einmal, Fingerabdruck)
+   ├─► pip install <Laufzeit-Pakete aus <engine>/pyproject.toml>   (einmal, Fingerabdruck)
    └─► python -m amt.runner input.ttl -o out/run-<Zeitstempel>/    →  out/latest
 
 python main.py        meta ─► tests        →  build/pipeline_report.txt
@@ -81,7 +81,9 @@ Eigenschaften, die das Repo haben muss:
 | `requirements.txt` | genau eine Datei pro Repo; hier nur Kommentar (Laufzeit = Standardbibliothek) plus `pytest` für die Entwicklung | 2026-10-26 |
 | Engine-Pin | Standard bleibt `main`; das README-Beispiel zeigt `41620dd`; Pin auf Tags erst nach S5 (engine) | 2026-10-26 |
 | Ort des Pipeline-Reports | `build/pipeline_report.txt`, ignoriert | 2026-10-26 |
-| `pytest` aus der Engine-`requirements.txt` | darf mitinstalliert werden (Engine-S6); keine zweite Liste im Runner | 2026-10-26 |
+| `pytest` aus der Engine-`requirements.txt` | hinfällig seit S6 (2026-10-27): der Runner installiert nur die Laufzeit-Pakete aus `pyproject.toml` des Engine-Klons, nicht mehr `requirements.txt` (die auch `pytest`, Pillow und PyYAML enthält); keine zweite Liste im Runner, nur der Rückfall bei fehlender Datei | 2026-10-27 |
+| Hinweis nach dem Lauf | `run_amt.py` nennt am Ende die Adresse des Explorers (`https://n4o-rse.github.io/amt-engine/explorer/`) und die Datei `<name>.reasoned.ttl`, die sich dort mit dem Ordner-Knopf laden lässt | 2026-10-27 |
+| Version | 0.3.0 zusammen mit der Engine 0.4.0 (Beschluss 2026-10-27); die Nummern ändert S13, nicht S6 | 2026-10-27 |
 | Versionen der GitHub Actions | `checkout@v5`, `setup-python@v6`, `upload-artifact@v6` (alle Node 24, geprüft an `action.yml`), wie in `amt-engine` | 2026-10-26 |
 | CI-Matrix | Ubuntu und Windows, Python 3.10 und 3.13; Auslöser Push auf `main`, Pull Request und manuell; nur `python main.py --strict` (meta, tests; ohne Netz), kein Smoke-Lauf | 2026-10-26 |
 | Autoren in `CITATION.cff` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
@@ -125,6 +127,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S3 | `CITATION.cff` und `LICENSE`: Autorenliste und Rechteinhaber klären | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-runner | S1 | erledigt 2026-10-26 |
 | S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | erledigt 2026-10-26 |
+| S6 | Nur Laufzeit-Abhängigkeiten installieren (aus `pyproject.toml` der Engine), Hinweis auf den Explorer, README | amt-runner | S5 | Patch geliefert, nach Push erledigt |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
@@ -219,6 +222,14 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Gegenprobe: eine angehängte Zeile in `animals.ttl` ließ `drift --strict` mit Exit-Code 1 enden.
 - Der Workflow ist mit `actionlint` geprüft; ein Lauf auf GitHub steht aus. Ein zweiter Lauf von `main.py --only …` überschreibt `build/pipeline_report.txt`; das Artefakt enthält darum nur den Bericht des letzten Schritts (`smoke`).
 - Beschlüsse in A4.
+
+## S6 – Schlankere Abhängigkeiten und Hinweis auf den Explorer
+
+**Ziel:** Der Runner installiert nur, was ein Lauf braucht, und sagt am Ende, wo man das Ergebnis ansehen kann.
+
+**Inhalt:** In `run_amt.py` liest `_engine_dependencies()` die Laufzeit-Pakete aus `[project].dependencies` der `pyproject.toml` des Engine-Klons (`tomllib`, unter Python 3.10 ein kleiner Textleser); fehlt die Datei oder ist sie unlesbar, gilt `AMT_FALLBACK_DEPS`. Der Fingerabdruck ist der Hash dieser Liste, nicht mehr der von `requirements.txt`: Änderungen an den Entwicklungspaketen der Engine lösen keine Neuinstallation mehr aus; beim ersten Lauf nach dem Update meldet der Runner einmal „Engine dependencies changed“. Nach dem Lauf steht die Adresse des Explorers in der Ausgabe. Tests: Parser, Fallback, Fingerabdruck, Aufruf von `pip`, Hinweis (7 neue Tests). README, CHANGELOG `[Unreleased]`.
+
+**Abnahme:** `python main.py --strict` grün, zweimal; `python main.py --only smoke --strict` (Netz) installiert nur `rdflib`, `pyshacl`, `pyvis` und endet mit der Explorer-Zeile.
 
 ---
 

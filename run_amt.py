@@ -2,8 +2,9 @@
 """
 run_amt.py — Run the AMT.engine pipeline on a single TTL file.
 
-Clones AMT.engine from GitHub into a local cache, installs its dependencies
-into your active Python environment, and runs the full pipeline:
+Clones AMT.engine from GitHub into a local cache, installs its run-time
+dependencies (rdflib, pyshacl, pyvis) into your active Python environment, and
+runs the full pipeline:
 
     validate (SHACL) → reason → export TTL + Cypher + CSV + HTML + report
 
@@ -29,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -45,11 +47,15 @@ __version__ = "0.2.1"
 AMT_REPO_URL = "https://github.com/n4o-rse/amt-engine.git"
 AMT_DEFAULT_REF = "main"
 
-# Fallback only. Since AMT.engine 0.3.0 the authoritative list lives in the
-# engine's own requirements.txt, which is what we install when it is there.
-# This list keeps older refs working, and any future engine that drops the
-# file.
+# Fallback only. The authoritative list is [project].dependencies in the
+# engine's own pyproject.toml, which is what we install when it can be read.
+# The engine's requirements.txt is not used: it also lists the packages of the
+# engine's development pipeline (pytest, Pillow, PyYAML), which a run does not
+# need. This list keeps refs without a readable pyproject.toml working.
 AMT_FALLBACK_DEPS = ["rdflib>=7.0", "pyshacl>=0.25", "pyvis>=0.3"]
+
+# Where the result of a run can be looked at.
+EXPLORER_URL = "https://n4o-rse.github.io/amt-engine/explorer/"
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 CACHE_DIR = SCRIPT_DIR / ".amt-cache"
@@ -153,10 +159,58 @@ def _describe_head() -> str:
         return "unknown commit"
 
 
-def _requirements_file() -> Path | None:
-    """The engine's own requirements.txt, if the checked-out ref ships one."""
-    candidate = REPO_DIR / "requirements.txt"
-    return candidate if candidate.exists() else None
+def _strings_of_list(text: str, start: int) -> list[str]:
+    """The quoted strings of the TOML list whose ``[`` is at ``text[start]``; brackets inside strings do not count."""
+    out, i, quote = [], start + 1, ""
+    buf = []
+    while i < len(text):
+        c = text[i]
+        if quote:
+            if c == quote:
+                out.append("".join(buf))
+                buf, quote = [], ""
+            else:
+                buf.append(c)
+        elif c in "\"'":
+            quote = c
+        elif c == "#":
+            i = text.find("\n", i) if "\n" in text[i:] else len(text)
+            continue
+        elif c == "]":
+            break
+        i += 1
+    return out
+
+
+def _dependencies_from_text(text: str) -> list[str]:
+    """``[project].dependencies`` read without ``tomllib`` (which Python 3.10 lacks); [] if not found."""
+    m = re.search(r"^\[project\]\s*$(.*?)(?=^\[|\Z)", text, re.M | re.S)
+    if not m:
+        return []
+    d = re.search(r"^dependencies\s*=\s*\[", m.group(1), re.M)
+    return _strings_of_list(m.group(1), d.end() - 1) if d else []
+
+
+def _engine_dependencies() -> tuple[list[str], str]:
+    """
+    The run-time dependencies of the cached engine and where they came from.
+
+    ``[project].dependencies`` of the engine's pyproject.toml; the built-in
+    fallback list if the file is missing or has none.
+    """
+    try:
+        text = (REPO_DIR / "pyproject.toml").read_text(encoding="utf-8")
+    except OSError:
+        return list(AMT_FALLBACK_DEPS), "built-in list"
+    deps: list[str] = []
+    try:
+        import tomllib
+        deps = list(tomllib.loads(text).get("project", {}).get("dependencies", []))
+    except ImportError:                      # Python 3.10
+        deps = _dependencies_from_text(text)
+    except ValueError:                       # tomllib.TOMLDecodeError: the file is broken
+        deps = []
+    return (deps, "the engine's pyproject.toml") if deps else (list(AMT_FALLBACK_DEPS), "built-in list")
 
 
 def _deps_fingerprint() -> str:
@@ -164,18 +218,16 @@ def _deps_fingerprint() -> str:
     Identify the dependency set currently in effect.
 
     Stored in the marker file so that checking out a different engine ref —
-    or the engine changing its requirements — triggers a reinstall instead
+    or the engine changing its dependencies — triggers a reinstall instead
     of silently reusing whatever happens to be in the environment.
     """
-    req = _requirements_file()
-    payload = req.read_bytes() if req else "\n".join(AMT_FALLBACK_DEPS).encode()
-    return hashlib.sha256(payload).hexdigest()
+    return hashlib.sha256("\n".join(_engine_dependencies()[0]).encode()).hexdigest()
 
 
 def ensure_deps() -> None:
-    """Install the engine's dependencies into the active Python (once)."""
+    """Install the engine's run-time dependencies into the active Python (once)."""
     fingerprint = _deps_fingerprint()
-    req = _requirements_file()
+    deps, source = _engine_dependencies()
 
     if DEPS_MARKER.exists() and DEPS_MARKER.read_text().strip() == fingerprint:
         # The marker records what we installed, not what is still there. If
@@ -193,12 +245,8 @@ def ensure_deps() -> None:
     else:
         print(f"[2/3] Installing dependencies into {sys.executable}")
 
-    if req is not None:
-        print(f"      (from the engine's own {req.name})")
-        run([sys.executable, "-m", "pip", "install", "--quiet", "-r", req])
-    else:
-        print(f"      ({', '.join(AMT_FALLBACK_DEPS)})")
-        run([sys.executable, "-m", "pip", "install", "--quiet", *AMT_FALLBACK_DEPS])
+    print(f"      ({', '.join(deps)}; from {source})")
+    run([sys.executable, "-m", "pip", "install", "--quiet", *deps])
 
     DEPS_MARKER.write_text(fingerprint)
 
@@ -245,6 +293,10 @@ def run_pipeline(input_file: Path, outdir: Path, engine_args: list[str]) -> None
     print(f"  (also accessible via {outdir.resolve() / 'latest'})")
     for p in sorted(run_dir.glob(f"{input_file.stem}.*")):
         print(f"    - {p.name}")
+    reasoned = run_dir / f"{input_file.stem}.reasoned.ttl"
+    if reasoned.exists():
+        print(f"\n  To look at the graph, open the AMT Explorer, {EXPLORER_URL}")
+        print(f"  and load {reasoned.name} with the folder button (it opens in your browser, nothing is uploaded).")
 
 
 def _update_latest_pointer(outdir: Path, run_dir: Path) -> None:

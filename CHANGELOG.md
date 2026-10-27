@@ -15,6 +15,17 @@ release published on GitHub and archived on Zenodo.
 
 ### Changed
 
+- `run_amt.py` installs only the run-time dependencies of the engine (rdflib,
+  pyshacl, pyvis), read from `[project].dependencies` in the engine's
+  `pyproject.toml`, and no longer the whole `requirements.txt`, which also lists
+  the engine's development packages (pytest, Pillow, PyYAML). The built-in list
+  remains the fallback. The first run after the update says once that the
+  dependencies changed and runs `pip`, which finds everything in place.
+- After a run, `run_amt.py` points to the AMT Explorer and to the reasoned Turtle
+  file that can be loaded there.
+- README "Related": the start page of AMT replaces the old domain; `https://w3id.org/amt/`
+  is named as its permanent address.
+
 - README: the link to the AMT Explorer points to its new address,
   `https://n4o-rse.github.io/amt-engine/explorer/`.
 

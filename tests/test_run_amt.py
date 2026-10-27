@@ -129,22 +129,82 @@ def test_unknown_ref_exits_with_a_message(cache: Path, origin: dict):
 # --------------------------------------------------------------------------- #
 # Dependencies
 # --------------------------------------------------------------------------- #
-def test_fingerprint_follows_the_engines_requirements(cache: Path, monkeypatch, tmp_path):
+PYPROJECT = """\
+[project]
+name = "amt"
+dependencies = [
+    "rdflib>=7.0",
+    "pyshacl>=0.25",   # SHACL
+    "pyvis[extra]>=0.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "Pillow>=10.1", "PyYAML>=6.0"]
+"""
+
+
+def test_only_the_run_time_dependencies_are_installed(monkeypatch, tmp_path):
+    repo = tmp_path / "engine"
+    repo.mkdir()
+    monkeypatch.setattr(run_amt, "REPO_DIR", repo)
+    (repo / "pyproject.toml").write_text(PYPROJECT, encoding="utf-8")
+    # the development packages of the engine's requirements.txt are not wanted
+    (repo / "requirements.txt").write_text("rdflib>=7.0\npytest>=7\nPillow>=10\nPyYAML>=6\n", encoding="utf-8")
+
+    deps, source = run_amt._engine_dependencies()
+    assert deps == ["rdflib>=7.0", "pyshacl>=0.25", "pyvis[extra]>=0.3"]
+    assert "pyproject.toml" in source
+
+
+def test_text_reader_gives_the_same_list_as_tomllib(monkeypatch):
+    # Python 3.10 has no tomllib; the small reader must agree with it where it exists
+    assert run_amt._dependencies_from_text(PYPROJECT) == ["rdflib>=7.0", "pyshacl>=0.25", "pyvis[extra]>=0.3"]
+    assert run_amt._dependencies_from_text("[tool.x]\ndependencies = [\"z\"]\n") == []
+    tomllib = pytest.importorskip("tomllib")
+    assert tomllib.loads(PYPROJECT)["project"]["dependencies"] == run_amt._dependencies_from_text(PYPROJECT)
+
+
+def test_fingerprint_follows_the_engines_dependencies(monkeypatch, tmp_path):
     repo = tmp_path / "engine"
     repo.mkdir()
     monkeypatch.setattr(run_amt, "REPO_DIR", repo)
 
     fallback = hashlib.sha256("\n".join(run_amt.AMT_FALLBACK_DEPS).encode()).hexdigest()
-    assert run_amt._requirements_file() is None
+    assert run_amt._engine_dependencies() == (run_amt.AMT_FALLBACK_DEPS, "built-in list")
     assert run_amt._deps_fingerprint() == fallback
 
-    req = repo / "requirements.txt"
-    req.write_bytes(b"rdflib>=7.0\n")
+    (repo / "pyproject.toml").write_text(PYPROJECT, encoding="utf-8")
     first = run_amt._deps_fingerprint()
-    assert first == hashlib.sha256(b"rdflib>=7.0\n").hexdigest() != fallback
+    assert first != fallback
 
-    req.write_bytes(b"rdflib>=7.0\npyshacl>=0.25\n")
+    # a change that is not a run-time dependency leaves the fingerprint alone ...
+    (repo / "pyproject.toml").write_text(PYPROJECT.replace("pytest>=7.0", "pytest>=8.0"), encoding="utf-8")
+    assert run_amt._deps_fingerprint() == first
+    # ... a run-time dependency changes it
+    (repo / "pyproject.toml").write_text(PYPROJECT.replace("rdflib>=7.0", "rdflib>=7.1"), encoding="utf-8")
     assert run_amt._deps_fingerprint() != first
+
+
+def test_broken_pyproject_falls_back(monkeypatch, tmp_path):
+    repo = tmp_path / "engine"
+    repo.mkdir()
+    monkeypatch.setattr(run_amt, "REPO_DIR", repo)
+    (repo / "pyproject.toml").write_text("this is [not toml", encoding="utf-8")
+    assert run_amt._engine_dependencies()[1] == "built-in list"
+
+
+def test_install_passes_exactly_the_run_time_dependencies_to_pip(monkeypatch, tmp_path, capsys):
+    repo = tmp_path / "engine"
+    repo.mkdir()
+    (repo / "pyproject.toml").write_text(PYPROJECT, encoding="utf-8")
+    monkeypatch.setattr(run_amt, "REPO_DIR", repo)
+    monkeypatch.setattr(run_amt, "DEPS_MARKER", tmp_path / ".deps-installed")
+    called = []
+    monkeypatch.setattr(run_amt, "run", lambda cmd, **kw: called.append([str(c) for c in cmd]))
+    run_amt.ensure_deps()
+    assert called == [[sys.executable, "-m", "pip", "install", "--quiet", "rdflib>=7.0", "pyshacl>=0.25", "pyvis[extra]>=0.3"]]
+    assert (tmp_path / ".deps-installed").read_text() == run_amt._deps_fingerprint()
+    assert "pyproject.toml" in capsys.readouterr().out
 
 
 # --------------------------------------------------------------------------- #
@@ -204,3 +264,29 @@ def test_latest_pointer_follows_the_newest_run(tmp_path):
 
     run_amt._update_latest_pointer(outdir, second)
     assert (outdir / "latest" / "x.txt").read_text(encoding="utf-8") == "two"
+
+
+# --------------------------------------------------------------------------- #
+# Hint after a run
+# --------------------------------------------------------------------------- #
+def test_run_ends_with_a_hint_to_the_explorer(monkeypatch, tmp_path, capsys):
+    outdir = tmp_path / "out"
+    inp = tmp_path / "animals.ttl"
+    inp.write_text("# x\n", encoding="utf-8")
+
+    def fake_run(cmd, **kwargs):                       # stands in for `python -m amt.runner`
+        run_dir = Path(cmd[cmd.index("-o") + 1])
+        (run_dir / "animals.reasoned.ttl").write_text("# x\n", encoding="utf-8")
+
+    monkeypatch.setattr(run_amt, "run", fake_run)
+    run_amt.run_pipeline(inp, outdir, [])
+    out = capsys.readouterr().out
+    assert run_amt.EXPLORER_URL in out and "animals.reasoned.ttl" in out
+
+
+def test_no_hint_when_there_is_no_reasoned_file(monkeypatch, tmp_path, capsys):
+    inp = tmp_path / "animals.ttl"
+    inp.write_text("# x\n", encoding="utf-8")
+    monkeypatch.setattr(run_amt, "run", lambda cmd, **kw: None)
+    run_amt.run_pipeline(inp, tmp_path / "out", [])
+    assert run_amt.EXPLORER_URL not in capsys.readouterr().out

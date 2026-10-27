@@ -18,7 +18,7 @@ for your own AMT-based projects.
 `run_amt.py` is a self-contained Python script that:
 
 1. **Clones AMT.engine** from GitHub into a local cache (`.amt-cache/`)
-2. **Installs its dependencies** into your active Python — once, from the engine's own `requirements.txt` (which also lists `pytest`, harmless here)
+2. **Installs its run-time dependencies** (rdflib, pyshacl, pyvis) into your active Python — once, as listed in `[project].dependencies` of the engine's own `pyproject.toml`; the engine's development packages are not installed
 3. **Runs `amt.runner`** — the engine's own full-pipeline entry point — into a fresh, timestamped folder:
    - SHACL validation against the AMT shapes
    - Fuzzy-logic reasoning (n-ary role chains, inverse roles, role subsumption)
@@ -163,7 +163,7 @@ the top of `animals.ttl` for the full reasoning.
 [1/3] Cloning https://github.com/n4o-rse/amt-engine.git ...
       engine ref 'main' at a50822c Merge branch 'main' of ...
 [2/3] Installing dependencies into /path/to/python
-      (from the engine's own requirements.txt)
+      (rdflib>=7.0, pyshacl>=0.25, pyvis>=0.3; from the engine's pyproject.toml)
 [3/3] Running pipeline on animals.ttl ...
 VAL  Validating animals.ttl ...
 OK   Validation passed.
@@ -187,6 +187,9 @@ OK   wrote out/run-20260505-104530/animals.report.md
     - animals.nodes.csv
     - animals.reasoned.ttl
     - animals.report.md
+
+  To look at the graph, open the AMT Explorer, https://n4o-rse.github.io/amt-engine/explorer/
+  and load animals.reasoned.ttl with the folder button (it opens in your browser, nothing is uploaded).
 ```
 
 The 46 asserted edges expand to **152 total edges** (46 asserted + 106 inferred)
@@ -437,7 +440,8 @@ plan and the decisions behind the repository.
 ## Related
 
 - [AMT.engine](https://github.com/n4o-rse/amt-engine) — the reasoning engine itself
-- [Academic Meta Tool](http://academic-meta-tool.xyz/) — the underlying framework
+- [Academic Meta Tool](https://n4o-rse.github.io/amt-engine/) — the start page of AMT (also
+  <https://w3id.org/amt/>; the vocabulary namespace stays `http://academic-meta-tool.xyz/vocab#`)
 - [AMT Explorer](https://n4o-rse.github.io/amt-engine/explorer/) — the engine's web viewer
   (`docs/` in the engine repository); it lets you pick a dataset, switch
   reasoning on and off and download Turtle or Cypher
