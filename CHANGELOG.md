@@ -13,14 +13,20 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-27
+
+0.4.0 adds a way to check a file without running it and explains a failed run;
+the arguments of a normal run and its output files are the same.
+
 ### Added
 
 - `--check-only`: validate, load and diagnose the file and stop. Nothing is written, so there
-  is no run folder and `out/latest` is left alone. Needs an engine newer than 0.4.0; with an
+  is no run folder and `out/latest` is left alone. Needs engine 0.5.0 or newer; with an
   older cached copy the wrapper says so and tells you to re-run with `--update`.
 - A failed run is explained: the wrapper names what exit code 1, 2 and 3 of the engine mean
   and links the How-To page on checking a file
-  (<https://n4o-rse.github.io/amt-engine/howto/validate/>). Any other code, which is usually a
+  (<https://n4o-rse.github.io/amt-engine/howto/validate/>); the page
+  <https://n4o-rse.github.io/amt-engine/howto/run/> describes the whole way from cloning to the graph. Any other code, which is usually a
   traceback from an outdated cached engine, is met with the advice to use `--update`.
 
 ### Changed
@@ -144,7 +150,8 @@ and continuous integration.
   `PotterAttributionExample`, `SKOSconceptExample`.
 - README with quickstart, output layout and an expected-output walkthrough.
 
-[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/n4o-rse/amt-runner/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/n4o-rse/amt-runner/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/n4o-rse/amt-runner/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/n4o-rse/amt-runner/compare/v0.1.0...v0.2.0

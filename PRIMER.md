@@ -83,7 +83,7 @@ Eigenschaften, die das Repo haben muss:
 | Ort des Pipeline-Reports | `build/pipeline_report.txt`, ignoriert | 2026-10-26 |
 | `pytest` aus der Engine-`requirements.txt` | hinfällig seit S6 (2026-10-27): der Runner installiert nur die Laufzeit-Pakete aus `pyproject.toml` des Engine-Klons, nicht mehr `requirements.txt` (die auch `pytest`, Pillow und PyYAML enthält); keine zweite Liste im Runner, nur der Rückfall bei fehlender Datei | 2026-10-27 |
 | Hinweis nach dem Lauf | `run_amt.py` nennt am Ende die Adresse des Explorers (`https://n4o-rse.github.io/amt-engine/explorer/`) und die Datei `<name>.reasoned.ttl`, die sich dort mit dem Ordner-Knopf laden lässt | 2026-10-27 |
-| Version | 0.3.0 zusammen mit der Engine 0.4.0 (Beschluss 2026-10-27); die Nummern ändert S13, nicht S6 | 2026-10-27 |
+| Version | 0.3.0 zusammen mit der Engine 0.4.0 (Beschluss 2026-10-27); die Nummern ändert S13, nicht S6; 0.4.0 zusammen mit der Engine 0.5.0 (S9, S18) | 2026-10-27 |
 | Versionen der GitHub Actions | `checkout@v5`, `setup-python@v6`, `upload-artifact@v6` (alle Node 24, geprüft an `action.yml`), wie in `amt-engine` | 2026-10-26 |
 | `--check-only` im Wrapper | gehört dem Wrapper (eigene Option, Hilfetext), wird an die Engine weitergereicht; schreibt nichts: kein Laufordner, kein `latest`; fehlt die Option in der gecachten Engine, endet der Wrapper mit Exit-Code 2 und dem Rat `--update` (gleiches Muster wie `--minimal`) | 2026-10-27 |
 | Meldung bei gescheitertem Lauf | der Wrapper erklärt die Exit-Codes 1 bis 3 der Engine in einem Satz und nennt die How-To-Seite; andere Codes (meist ein Traceback einer zu alten Engine) bekommen den Rat `--update`; der Exit-Code wird unverändert durchgereicht | 2026-10-27 |
@@ -131,7 +131,8 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S5 | Tags `v0.1.0`, `v0.2.0` setzen, Release 0.2.1, Zenodo-DOI | amt-runner | S3, S4 | erledigt 2026-10-26 |
 | S6 | Nur Laufzeit-Abhängigkeiten installieren (aus `pyproject.toml` der Engine), Hinweis auf den Explorer, README | amt-runner | S5 | Patch geliefert, nach Push erledigt |
 | S7 | Release 0.3.0 (Version, CHANGELOG, `smoke` mit `--update`), Tag, GitHub-Release, Zenodo | amt-runner | S6 | Patch, Tag `v0.3.0`, Release und Zenodo erledigt; DOI-Patch (Versions-DOI `10.5281/zenodo.23688616`) geliefert |
-| S8 | `--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update` (Gegenstück zu S16 in `amt-engine`) | amt-runner | S7 | Patch geliefert |
+| S8 | `--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update` (Gegenstück zu S16 in `amt-engine`) | amt-runner | S7 | erledigt 2026-10-27 |
+| S9 | Release 0.4.0 (Version, CHANGELOG, Pinning-Beispiel `v0.5.0`), Tag, GitHub-Release, Zenodo (Gegenstück zu S18 in `amt-engine`) | amt-runner | S8 | 9a als Patch geliefert |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
@@ -264,6 +265,16 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Sandbox: 33 Tests grün (vorher 27). Noch offen: der Netz-Lauf `python main.py --only smoke --strict` und ein Lauf unter Windows; `--check-only` gegen die echte Engine geht erst, wenn der Engine-Patch (S16) auf `main` liegt.
 
 ---
+
+## S9 – Release 0.4.0
+
+**Ziel:** Der Runner 0.4.0 mit `--check-only` ist veröffentlicht und archiviert, zusammen mit der Engine 0.5.0 (siehe S18 im Primer von `amt-engine`).
+
+**Inhalt (9a, Patch):** Version 0.4.0 in `run_amt.py`, `CITATION.cff`, `py/amt_runner_dev_utils.py` und `CHANGELOG.md`; die README nennt `--ref v0.5.0` als Beispiel und verlangt für `--check-only` die Engine 0.5.0 oder neuer (die Engine 0.4.0 kennt die Option nicht); Verweis auf die How-To-Seite „Run and look at the result“.
+
+**Danach (manuell, 9b):** annotierter Tag `v0.4.0` auf dem Commit von 9a, Release auf GitHub, Zenodo. **9c (Patch):** die Versions-DOI in README und CHANGELOG.
+
+**Abnahme:** `python main.py --strict` zweimal grün; `python main.py --only smoke --strict` läuft gegen die Engine `main`; `git tag` zeigt `v0.4.0`.
 
 ## Teil D – Offene Punkte
 

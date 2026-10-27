@@ -259,7 +259,8 @@ It validates the file, loads it and reports problems in plain words, naming the 
 to add (for example an edge that points at something that is not declared as a node). If the
 wrapper says it does not know `--check-only`, the engine in `.amt-cache/` is older than the
 flag: add `--update`. How to build a file and what each message means:
-[How-To](https://n4o-rse.github.io/amt-engine/howto/).
+[How-To](https://n4o-rse.github.io/amt-engine/howto/); the whole way from cloning to the graph:
+[Run and look at the result](https://n4o-rse.github.io/amt-engine/howto/run/).
 
 Your file needs to follow the AMT vocabulary — Concepts, Roles, weighted edges,
 and (optionally) RoleChainAxioms, InverseAxioms or SubsumptionAxioms. The bundled
@@ -274,20 +275,20 @@ specification see the [AMT.engine README](https://github.com/n4o-rse/amt-engine)
 | `--minimal` | off | Suppress inferred edges implied by a finer role (needs engine ≥ 0.3.0) |
 | `--ref REF` | `main` | Pin AMT.engine to a tag, branch, or commit SHA |
 | `--update` | off | Fetch the current engine before running |
-| `--check-only` | off | Validate, load and diagnose; write nothing (needs an engine newer than 0.4.0) |
+| `--check-only` | off | Validate, load and diagnose; write nothing (needs engine 0.5.0 or newer) |
 
 Everything else is forwarded to `amt.runner` — `--no-check`, `--no-report`,
 `--no-info`, `--height`, and whatever the engine gains next.
 
 Pinning is the right move for reproducible pipelines. Branches, commit SHAs
 and tags all work; the engine publishes a tag for every release (`v0.3.1` was
-the first one that is archived on Zenodo, `v0.4.0` is the current one). The cache is
+the first one that is archived on Zenodo, `v0.5.0` is the current one). The cache is
 cloned shallow, so a ref other than the tip of `main` is not in it at first;
 the script notices and fetches the rest of the history on demand rather than
 failing:
 
 ```bash
-python run_amt.py animals.ttl --ref v0.4.0
+python run_amt.py animals.ttl --ref v0.5.0
 python run_amt.py animals.ttl --ref 41620dd1e9f57bfbb3f4db543853aec8ecd2a906
 ```
 

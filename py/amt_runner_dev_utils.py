@@ -19,7 +19,7 @@ from pathlib import Path
 # --------------------------------------------------------------------------- #
 # Must equal __version__ in run_amt.py, `version` in CITATION.cff and the newest
 # released entry of CHANGELOG.md. The ``meta`` step checks all four.
-RELEASE = "0.3.0"
+RELEASE = "0.4.0"
 RELEASE_DATE = "2026-10-27"
 
 # --------------------------------------------------------------------------- #

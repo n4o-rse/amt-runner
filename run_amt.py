@@ -15,7 +15,7 @@ Usage
     python run_amt.py path/to/input.ttl --check-only # validate + diagnose, write nothing
     python run_amt.py path/to/input.ttl --minimal    # drop subsumed edges
     python run_amt.py path/to/input.ttl --update     # pull latest amt.engine
-    python run_amt.py path/to/input.ttl --ref v0.4.0 # pin to a tag/branch/sha
+    python run_amt.py path/to/input.ttl --ref v0.5.0 # pin to a tag/branch/sha
 
 Any flag this script does not recognise is passed straight through to
 ``amt.runner`` — ``--no-check``, ``--no-report``, ``--height 900px`` and so
@@ -40,7 +40,7 @@ from pathlib import Path
 # Version of this wrapper, not of the engine it runs. It must equal the newest
 # released entry in CHANGELOG.md and `version` in CITATION.cff; `python main.py`
 # checks all three.
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 # --------------------------------------------------------------------------- #
 # Configuration
@@ -366,7 +366,7 @@ def parse_args() -> tuple[argparse.Namespace, list[str]]:
     p.add_argument(
         "--check-only", action="store_true",
         help="Validate, load and diagnose the file, then stop. Writes no output "
-             "(needs an AMT.engine newer than 0.4.0; use --update to fetch it)",
+             "(needs AMT.engine 0.5.0 or newer; use --update to fetch it)",
     )
     p.add_argument(
         "--ref", default=AMT_DEFAULT_REF,
