@@ -13,6 +13,11 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+### Changed
+
+- `README.md`, "Citation": names the version DOI of 0.5.0,
+  `10.5281/zenodo.23809732`. The concept DOI is unchanged.
+
 ## [0.5.0] - 2026-10-30
 
 0.5.0 runs files whose statements carry a type and a method (the hextuple of AMT.engine 0.6.0). The arguments of

@@ -142,7 +142,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S8 | `--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update` (Gegenstück zu S16 in `amt-engine`) | amt-runner | S7 | erledigt 2026-10-27 |
 | S9 | Release 0.4.0 (Version, CHANGELOG, Pinning-Beispiel `v0.5.0`), Tag, GitHub-Release, Zenodo (Gegenstück zu S18 in `amt-engine`) | amt-runner | S8 | 9a und 9b erledigt (Tag `v0.4.0`, Release, Zenodo); 9c als Patch geliefert |
 | S10 | Adressen auf `alpaca-fair-framework` umstellen (`AMT_REPO_URL`, `EXPLORER_URL`, `HOWTO_URL`, `CITATION.cff`, README, `drift`); Gegenstück zu S19 in `amt-engine` | amt-runner | S9 | erledigt 2026-10-30 |
-| S11 | Hextupel: Beispiel samt `.md`, README-Abschnitt, Hinweis auf die Mindestversion der Engine; Release 0.5.0 samt Zenodo; Gegenstück zu S21 bis S23 in `amt-engine` | amt-runner | S10, Engine S21 | 11a Patch geliefert; 11b (Tag, Release, Zenodo) und 11c (Versions-DOI) offen |
+| S11 | Hextupel: Beispiel samt `.md`, README-Abschnitt, Hinweis auf die Mindestversion der Engine; Release 0.5.0 samt Zenodo; Gegenstück zu S21 bis S23 in `amt-engine` | amt-runner | S10, Engine S21 | 11a und 11b erledigt (Tag `v0.5.0`, Release, Zenodo); 11c als Patch geliefert |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
@@ -319,7 +319,13 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Version 0.5.0 in `run_amt.py`, `py/amt_runner_dev_utils.py` (`RELEASE`, `RELEASE_DATE` 2026-10-30), `CITATION.cff` und `CHANGELOG.md` (`[0.5.0] - 2026-10-30`, Vergleichslinks); Pinning-Beispiel `--ref v0.6.0`.
 - Neu: `hextuple-demo.ttl` (byte-gleich zur Engine) und `hextuple-demo.md` (Befehl `python run_amt.py hextuple-demo.ttl`, Hinweis auf Engine 0.6.0; weicht gewollt ab, steht in `INTENDED` von `py/step_drift.py`); README-Abschnitt und Layout-Zeile.
 - Geprüft: `python main.py --strict` zweimal grün, `git status` stabil; `python main.py --only drift` grün (8 Dateien gleich, 2 weichen gewollt ab); `python run_amt.py hextuple-demo.ttl --update` gegen die gepushte Engine (a451995): alle sechs Ausgabedateien, fünf `fw:hasMethod` in der Ausgabe. `smoke` wurde nicht auf `hextuple-demo.ttl` erweitert (er prüft weiter `animals.ttl`).
-- Offen: 11b (manuell), 11c (Versions-DOI).
+- Offen: 11b und 11c siehe unten.
+
+### Erledigt 2026-10-30 (11b, 11c)
+
+- 11b (durch den Autor): Commit `f18f360` (Release-Patch), Folgecommit `eb6adb1`, annotierter Tag `v0.5.0` auf `eb6adb1`, GitHub-Release, Zenodo. Versions-DOI Runner 0.5.0: `10.5281/zenodo.23809732`; die Concept-DOI `10.5281/zenodo.23669557` bleibt.
+- Zwischenfall: im lokalen Checkout des Autors fehlten `animals.ttl`, `subsumption-demo.ttl` und `SKOSconceptExample.ttl` schon vor dem Einspielen (`git status` zeigte `D`, `smoke` meldete „Input file not found: animals.ttl“). `git add -A` hat die Löschungen in `f18f360` mit aufgenommen (12 statt der erwarteten 9 Einträge). Behoben mit `git checkout 5802352 -- <drei Dateien>` und Folgecommit `eb6adb1`; der Tag wurde erst danach gesetzt. Regel: vor `git add -A` muss `git status --short` genau die in der `PATCH-README.md` genannten Einträge zeigen, und ein roter Schritt (hier `smoke`) wird vor dem Commit geklärt.
+- 11c (Patch): die Versions-DOI in README (Abschnitt „Citation“) und unter `[Unreleased]` im CHANGELOG.
 
 ## Teil D – Offene Punkte
 
