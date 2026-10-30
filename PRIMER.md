@@ -141,8 +141,8 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S7 | Release 0.3.0 (Version, CHANGELOG, `smoke` mit `--update`), Tag, GitHub-Release, Zenodo | amt-runner | S6 | Patch, Tag `v0.3.0`, Release und Zenodo erledigt; DOI-Patch (Versions-DOI `10.5281/zenodo.23688616`) geliefert |
 | S8 | `--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update` (Gegenstück zu S16 in `amt-engine`) | amt-runner | S7 | erledigt 2026-10-27 |
 | S9 | Release 0.4.0 (Version, CHANGELOG, Pinning-Beispiel `v0.5.0`), Tag, GitHub-Release, Zenodo (Gegenstück zu S18 in `amt-engine`) | amt-runner | S8 | 9a und 9b erledigt (Tag `v0.4.0`, Release, Zenodo); 9c als Patch geliefert |
-| S10 | Adressen auf `alpaca-fair-framework` umstellen (`AMT_REPO_URL`, `EXPLORER_URL`, `HOWTO_URL`, `CITATION.cff`, README, `drift`); Gegenstück zu S19 in `amt-engine` | amt-runner | S9 | Patch geliefert, nach Push erledigt |
-| S11 | Hextupel: Beispiel samt `.md`, README-Abschnitt, Hinweis auf die Mindestversion der Engine; Release 0.5.0 samt Zenodo; Gegenstück zu S21 bis S23 in `amt-engine` | amt-runner | S10, Engine S21 | offen |
+| S10 | Adressen auf `alpaca-fair-framework` umstellen (`AMT_REPO_URL`, `EXPLORER_URL`, `HOWTO_URL`, `CITATION.cff`, README, `drift`); Gegenstück zu S19 in `amt-engine` | amt-runner | S9 | erledigt 2026-10-30 |
+| S11 | Hextupel: Beispiel samt `.md`, README-Abschnitt, Hinweis auf die Mindestversion der Engine; Release 0.5.0 samt Zenodo; Gegenstück zu S21 bis S23 in `amt-engine` | amt-runner | S10, Engine S21 | 11a Patch geliefert; 11b (Tag, Release, Zenodo) und 11c (Versions-DOI) offen |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
 
@@ -313,6 +313,13 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 **Inhalt:** das Beispiel `hextuple-demo.ttl` mit `.md` (die `.md` weicht wie bei `subsumption-demo.md` gewollt ab: Befehle `python run_amt.py …`); ein README-Abschnitt (Englisch), der Typ und Methode erklärt, die Mindestversion der Engine nennt und `--update` empfiehlt; keine neue Wrapper-Logik und deshalb kein neuer Offline-Test, `smoke` deckt das Beispiel gegen die echte Engine ab. Version 0.5.0 in `run_amt.py`, `CITATION.cff`, `py/amt_runner_dev_utils.py` und `CHANGELOG.md`; Release nach dem Muster von S9 (11a Patch, 11b manuell: Tag, Release, Zenodo; 11c Patch: Versions-DOI).
 
 **Abnahme:** wie S9: `python main.py --strict` zweimal grün; `python main.py --only smoke --strict` läuft mit dem Hextupel-Beispiel durch und die Ausgabe nennt Typ und Methode; `git tag` zeigt `v0.5.0`; nach 11c nennt die README die Versions-DOI.
+
+### Erledigt 2026-10-30 (11a)
+
+- Version 0.5.0 in `run_amt.py`, `py/amt_runner_dev_utils.py` (`RELEASE`, `RELEASE_DATE` 2026-10-30), `CITATION.cff` und `CHANGELOG.md` (`[0.5.0] - 2026-10-30`, Vergleichslinks); Pinning-Beispiel `--ref v0.6.0`.
+- Neu: `hextuple-demo.ttl` (byte-gleich zur Engine) und `hextuple-demo.md` (Befehl `python run_amt.py hextuple-demo.ttl`, Hinweis auf Engine 0.6.0; weicht gewollt ab, steht in `INTENDED` von `py/step_drift.py`); README-Abschnitt und Layout-Zeile.
+- Geprüft: `python main.py --strict` zweimal grün, `git status` stabil; `python main.py --only drift` grün (8 Dateien gleich, 2 weichen gewollt ab); `python run_amt.py hextuple-demo.ttl --update` gegen die gepushte Engine (a451995): alle sechs Ausgabedateien, fünf `fw:hasMethod` in der Ausgabe. `smoke` wurde nicht auf `hextuple-demo.ttl` erweitert (er prüft weiter `animals.ttl`).
+- Offen: 11b (manuell), 11c (Versions-DOI).
 
 ## Teil D – Offene Punkte
 

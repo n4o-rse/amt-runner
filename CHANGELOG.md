@@ -13,6 +13,18 @@ release published on GitHub and archived on Zenodo.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-30
+
+0.5.0 runs files whose statements carry a type and a method (the hextuple of AMT.engine 0.6.0). The arguments of
+a run and its output files are the same; the wrapper itself does not read the type or the method.
+
+### Added
+
+- `hextuple-demo.ttl` and `hextuple-demo.md`: copies of the engine's example with statements that carry
+  `fw:hasType` and `fw:hasMethod`, and the derivations the engine adds. Run it with
+  `python run_amt.py hextuple-demo.ttl`. It needs AMT.engine 0.6.0 or newer; with an older cached engine, add
+  `--update`. The `README.md` has a section on it.
+
 ### Changed
 
 - `README.md`, "Citation": names the version DOI of 0.4.0,
@@ -161,7 +173,8 @@ and continuous integration.
   `PotterAttributionExample`, `SKOSconceptExample`.
 - README with quickstart, output layout and an expected-output walkthrough.
 
-[Unreleased]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.2.0...v0.2.1

@@ -32,6 +32,7 @@ CLONE_DIR = BUILD_DIR / "drift" / "amt-engine"
 # Files that differ from the engine's on purpose, with the reason.
 INTENDED = {
     "subsumption-demo.md": "commands use `python run_amt.py ...` instead of `python -m amt.runner ...`",
+    "hextuple-demo.md": "command uses `python run_amt.py ...` instead of `python -m amt.runner ...`, plus a note on engine 0.6.0",
 }
 
 SUFFIXES = (".ttl", ".md")
