@@ -1,6 +1,6 @@
 # amt-runner
 
-A small wrapper script that runs the [AMT.engine](https://github.com/n4o-rse/amt-engine)
+A small wrapper script that runs the [AMT.engine](https://github.com/alpaca-fair-framework/amt-engine)
 pipeline on a single Turtle file — **validate → reason → export everything** —
 without requiring you to clone or install the engine yourself.
 
@@ -55,7 +55,7 @@ On Windows and macOS, installing globally works but a venv is still cleaner.
 ## Quickstart
 
 ```bash
-git clone https://github.com/n4o-rse/amt-runner.git
+git clone https://github.com/alpaca-fair-framework/amt-runner.git
 cd amt-runner
 python run_amt.py animals.ttl
 ```
@@ -75,7 +75,7 @@ You want to see what AMT.engine produces for a TTL file. Clone, run, look at
 `out/latest/animals.html`. Done. No GitHub account needed.
 
 ```bash
-git clone https://github.com/n4o-rse/amt-runner.git
+git clone https://github.com/alpaca-fair-framework/amt-runner.git
 cd amt-runner
 python run_amt.py animals.ttl
 ```
@@ -91,14 +91,14 @@ along as a small piece of glue.
 ```bash
 mkdir my-amt-project
 cd my-amt-project
-curl -O https://raw.githubusercontent.com/n4o-rse/amt-runner/main/run_amt.py
-curl -O https://raw.githubusercontent.com/n4o-rse/amt-runner/main/.gitignore
+curl -O https://raw.githubusercontent.com/alpaca-fair-framework/amt-runner/main/run_amt.py
+curl -O https://raw.githubusercontent.com/alpaca-fair-framework/amt-runner/main/.gitignore
 # add your own TTL files
 git init && git add . && git commit -m "Initial commit"
 ```
 
 You don't need to fork `amt-runner` for this. Forking would mark your repo as
-"forked from n4o-rse/amt-runner" on GitHub, which is the wrong signal if your
+"forked from alpaca-fair-framework/amt-runner" on GitHub, which is the wrong signal if your
 repo is really about your data, not about contributing to the runner.
 
 ### Contribute back to amt-runner
@@ -106,9 +106,9 @@ repo is really about your data, not about contributing to the runner.
 You found a bug in `run_amt.py`, want to add a feature, or improve the README.
 This is the case where forking makes sense:
 
-1. Fork `n4o-rse/amt-runner` on GitHub
+1. Fork `alpaca-fair-framework/amt-runner` on GitHub
 2. Clone your fork, make changes, commit, push
-3. Open a pull request against `n4o-rse/amt-runner:main`
+3. Open a pull request against `alpaca-fair-framework/amt-runner:main`
 
 ## How outputs are organised
 
@@ -160,7 +160,7 @@ the top of `animals.ttl` for the full reasoning.
 ## Expected output
 
 ```
-[1/3] Cloning https://github.com/n4o-rse/amt-engine.git ...
+[1/3] Cloning https://github.com/alpaca-fair-framework/amt-engine.git ...
       engine ref 'main' at a50822c Merge branch 'main' of ...
 [2/3] Installing dependencies into /path/to/python
       (rdflib>=7.0, pyshacl>=0.25, pyvis>=0.3; from the engine's pyproject.toml)
@@ -188,7 +188,7 @@ OK   wrote out/run-20260505-104530/animals.report.md
     - animals.reasoned.ttl
     - animals.report.md
 
-  To look at the graph, open the AMT Explorer, https://n4o-rse.github.io/amt-engine/explorer/
+  To look at the graph, open the AMT Explorer, https://alpaca-fair-framework.github.io/amt-engine/explorer/
   and load animals.reasoned.ttl with the folder button (it opens in your browser, nothing is uploaded).
 ```
 
@@ -259,13 +259,13 @@ It validates the file, loads it and reports problems in plain words, naming the 
 to add (for example an edge that points at something that is not declared as a node). If the
 wrapper says it does not know `--check-only`, the engine in `.amt-cache/` is older than the
 flag: add `--update`. How to build a file and what each message means:
-[How-To](https://n4o-rse.github.io/amt-engine/howto/); the whole way from cloning to the graph:
-[Run and look at the result](https://n4o-rse.github.io/amt-engine/howto/run/).
+[How-To](https://alpaca-fair-framework.github.io/amt-engine/howto/); the whole way from cloning to the graph:
+[Run and look at the result](https://alpaca-fair-framework.github.io/amt-engine/howto/run/).
 
 Your file needs to follow the AMT vocabulary — Concepts, Roles, weighted edges,
 and (optionally) RoleChainAxioms, InverseAxioms or SubsumptionAxioms. The bundled
 [`animals.ttl`](animals.ttl) is the most complete worked example; for the formal
-specification see the [AMT.engine README](https://github.com/n4o-rse/amt-engine).
+specification see the [AMT.engine README](https://github.com/alpaca-fair-framework/amt-engine).
 
 ## Options
 
@@ -455,10 +455,10 @@ plan and the decisions behind the repository.
 
 ## Related
 
-- [AMT.engine](https://github.com/n4o-rse/amt-engine) — the reasoning engine itself
-- [Academic Meta Tool](https://n4o-rse.github.io/amt-engine/) — the start page of AMT (also
+- [AMT.engine](https://github.com/alpaca-fair-framework/amt-engine) — the reasoning engine itself
+- [Academic Meta Tool](https://alpaca-fair-framework.github.io/amt-engine/) — the start page of AMT (also
   <https://w3id.org/amt/>; the vocabulary namespace stays `http://academic-meta-tool.xyz/vocab#`)
-- [AMT Explorer](https://n4o-rse.github.io/amt-engine/explorer/) — the engine's web viewer
+- [AMT Explorer](https://alpaca-fair-framework.github.io/amt-engine/explorer/) — the engine's web viewer
   (`docs/` in the engine repository); it lets you pick a dataset, switch
   reasoning on and off and download Turtle or Cypher
 - [AMT webviewer (CAA2026-amt)](https://github.com/leiza-scit/CAA2026-amt) — a

@@ -17,6 +17,12 @@ release published on GitHub and archived on Zenodo.
 
 - `README.md`, "Citation": names the version DOI of 0.4.0,
   `10.5281/zenodo.23695549`. The concept DOI is unchanged.
+- The repository and the engine now live under `alpaca-fair-framework`. The clone target of the wrapper
+  (`AMT_REPO_URL`), the Explorer and How-To links it prints, `CITATION.cff`, the `README.md` and the reference
+  links of this file are updated.
+- The bundled examples follow the engine: the instance namespaces change from `http://github.com/n4o-rse/amt-explore/`
+  and `http://github.com/n4o-rse/amt-engine/subsumption-demo/` to the same paths under `alpaca-fair-framework`.
+  The outputs of a run are the same apart from these IRIs.
 
 ## [0.4.0] - 2026-10-27
 
@@ -155,9 +161,9 @@ and continuous integration.
   `PotterAttributionExample`, `SKOSconceptExample`.
 - README with quickstart, output layout and an expected-output walkthrough.
 
-[Unreleased]: https://github.com/n4o-rse/amt-runner/compare/v0.4.0...HEAD
-[0.4.0]: https://github.com/n4o-rse/amt-runner/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/n4o-rse/amt-runner/compare/v0.2.1...v0.3.0
-[0.2.1]: https://github.com/n4o-rse/amt-runner/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/n4o-rse/amt-runner/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/n4o-rse/amt-runner/commit/fc8d18d
+[Unreleased]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/alpaca-fair-framework/amt-runner/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/alpaca-fair-framework/amt-runner/commit/fc8d18d

@@ -45,7 +45,7 @@ __version__ = "0.4.0"
 # --------------------------------------------------------------------------- #
 # Configuration
 # --------------------------------------------------------------------------- #
-AMT_REPO_URL = "https://github.com/n4o-rse/amt-engine.git"
+AMT_REPO_URL = "https://github.com/alpaca-fair-framework/amt-engine.git"
 AMT_DEFAULT_REF = "main"
 
 # Fallback only. The authoritative list is [project].dependencies in the
@@ -56,10 +56,10 @@ AMT_DEFAULT_REF = "main"
 AMT_FALLBACK_DEPS = ["rdflib>=7.0", "pyshacl>=0.25", "pyvis>=0.3"]
 
 # Where the result of a run can be looked at.
-EXPLORER_URL = "https://n4o-rse.github.io/amt-engine/explorer/"
+EXPLORER_URL = "https://alpaca-fair-framework.github.io/amt-engine/explorer/"
 
 # Where a failed run is explained.
-HOWTO_URL = "https://n4o-rse.github.io/amt-engine/howto/validate/"
+HOWTO_URL = "https://alpaca-fair-framework.github.io/amt-engine/howto/validate/"
 
 # What the exit codes of amt.runner mean, in words for people who do not read tracebacks.
 EXIT_MESSAGES = {

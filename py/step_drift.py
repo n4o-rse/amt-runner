@@ -26,7 +26,7 @@ try:
 except ImportError:  # imported as py.step_drift
     from py.amt_runner_dev_utils import BUILD_DIR, ROOT, Report
 
-ENGINE_URL = "https://github.com/n4o-rse/amt-engine.git"
+ENGINE_URL = "https://github.com/alpaca-fair-framework/amt-engine.git"
 CLONE_DIR = BUILD_DIR / "drift" / "amt-engine"
 
 # Files that differ from the engine's on purpose, with the reason.

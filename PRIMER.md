@@ -100,6 +100,8 @@ Eigenschaften, die das Repo haben muss:
 | Hextupel im Runner | Vorschlag: die Beschlüsse stehen im Primer von `amt-engine` (A4, 2026-10-30: Standard „vage“, Gewichts-Properties, abgeleitete Kanten); der Runner bekommt keine eigene Typ-Logik und kein neues Flag | Vorschlag |
 | Versions-Hinweis zum Hextupel | Vorschlag: keine Versionsprüfung im Wrapper (anders als bei `--minimal` und `--check-only`, die neue Optionen sind); die README nennt die Mindestversion der Engine und verweist auf `--update` | Vorschlag |
 | Version | Vorschlag: Runner 0.5.0 zusammen mit Engine 0.6.0 | Vorschlag |
+| Adressen nach dem Umzug | folgt dem Engine-Primer (A4, 2026-10-30): Klonziel `https://github.com/alpaca-fair-framework/amt-engine.git`, Explorer und How-To unter `https://alpaca-fair-framework.github.io/amt-engine/`; die Prosa veröffentlichter CHANGELOG-Einträge behält die Adresse ihrer Zeit | 2026-10-30 |
+| Namensräume der Beispiele | die Kopien folgen der Engine (A4 dort, 2026-10-30): `http://github.com/alpaca-fair-framework/amt-explore/` und `http://github.com/alpaca-fair-framework/amt-engine/subsumption-demo/`; die Kopien sind byteweise gleich mit denen der Engine, `drift` prüft das | 2026-10-30 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
 
@@ -139,7 +141,7 @@ Entfällt: Das Repo veröffentlicht kein RDF. Die Beispieldateien sind Eingaben 
 | S7 | Release 0.3.0 (Version, CHANGELOG, `smoke` mit `--update`), Tag, GitHub-Release, Zenodo | amt-runner | S6 | Patch, Tag `v0.3.0`, Release und Zenodo erledigt; DOI-Patch (Versions-DOI `10.5281/zenodo.23688616`) geliefert |
 | S8 | `--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update` (Gegenstück zu S16 in `amt-engine`) | amt-runner | S7 | erledigt 2026-10-27 |
 | S9 | Release 0.4.0 (Version, CHANGELOG, Pinning-Beispiel `v0.5.0`), Tag, GitHub-Release, Zenodo (Gegenstück zu S18 in `amt-engine`) | amt-runner | S8 | 9a und 9b erledigt (Tag `v0.4.0`, Release, Zenodo); 9c als Patch geliefert |
-| S10 | Adressen auf `alpaca-fair-framework` umstellen (`AMT_REPO_URL`, `EXPLORER_URL`, `HOWTO_URL`, `CITATION.cff`, README, `drift`); Gegenstück zu S19 in `amt-engine` | amt-runner | S9 | offen |
+| S10 | Adressen auf `alpaca-fair-framework` umstellen (`AMT_REPO_URL`, `EXPLORER_URL`, `HOWTO_URL`, `CITATION.cff`, README, `drift`); Gegenstück zu S19 in `amt-engine` | amt-runner | S9 | Patch geliefert, nach Push erledigt |
 | S11 | Hextupel: Beispiel samt `.md`, README-Abschnitt, Hinweis auf die Mindestversion der Engine; Release 0.5.0 samt Zenodo; Gegenstück zu S21 bis S23 in `amt-engine` | amt-runner | S10, Engine S21 | offen |
 
 S2 bis S5 sind erledigt. Offen bleiben die Punkte in Teil D.
@@ -296,6 +298,12 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 **Abnahme:** `git grep -n "n4o-rse" -- .` nennt nur bewusst belassene Treffer (mit Liste im `PATCH-README.md`); `python main.py --strict` zweimal grün, `git status` danach sauber; `python main.py --only smoke --strict` klont die Engine von der neuen Adresse und läuft durch.
 
+### Erledigt 2026-10-30
+
+- Ersetzt in `run_amt.py` (`AMT_REPO_URL`, `EXPLORER_URL`, `HOWTO_URL`), `py/step_drift.py` (`ENGINE_URL`), `CITATION.cff`, `README.md` (Klonbefehle, Fork- und Pull-Request-Hinweise, Beispielausgabe, Links), den Namensräumen der drei kopierten Beispiele und den Verweislinks am Ende des `CHANGELOG.md`. Die Prosa der veröffentlichten Einträge (drei Stellen mit der alten Pages-Adresse) und die älteren Einträge in diesem Primer bleiben unverändert.
+- Die Beispielkopien sind byteweise gleich mit denen im Engine-Patch (S19, Namensräume). Bis der Engine-Patch gepusht ist, meldet `drift` Abweichungen, weil es gegen die Engine `main` vergleicht; deshalb beide Patches zusammen einspielen und die Engine zuerst pushen.
+- `python main.py --strict` zweimal grün; `python main.py --only smoke --strict` klont die Engine über die neue Adresse und läuft durch (106 abgeleitete Kanten, Explorer-Hinweis mit der neuen Adresse).
+
 ## S11 – Hextupel im Runner und Release 0.5.0
 
 **Ziel:** Eine Datei mit Typ und Methode läuft über den Runner, und der Runner 0.5.0 ist zusammen mit der Engine 0.6.0 veröffentlicht und archiviert.
@@ -315,4 +323,4 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D5** erledigt 2026-10-26 (Engine-S6): `pytest` darf mitkommen. Ausgangslage: Engine-Primer, Beschluss vom 2026-10-26 („eine `requirements.txt` pro Repo“); `amt-engine` hatte zusätzlich `requirements-dev.txt`. Fasst man beide zusammen, installiert dieser Runner beim Start auch `pytest`, weil er die Datei der Engine verwendet. Entscheidung dort (Schritt S6).
 - **D6** Der Engine-Aufruf aus `run_amt.py` liefert bei Konsistenzverletzungen Exit-Code 0 (siehe Engine-Primer, D6); der Wrapper reicht ihn unverändert durch.
 - **D7** S11 wartet auf S20 im Primer von `amt-engine` (Festlegungen zum Hextupel) und auf S21 (Engine mit Typ und Methode). Erst danach Beispiel und README-Abschnitt schreiben.
-- **D8** Die Pages-Adresse der Engine nach dem Umzug (Engine-Primer, D18) bestimmt `EXPLORER_URL` und `HOWTO_URL`; S10 erst danach ausliefern.
+- **D8** erledigt in S10 (2026-10-30): Die Pages-Adresse ist `https://alpaca-fair-framework.github.io/amt-engine/` (Engine-Primer, A4); `EXPLORER_URL` und `HOWTO_URL` sind umgestellt.
